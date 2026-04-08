@@ -6,3 +6,19 @@
 //
 
 import Foundation
+
+struct ExtraService: Identifiable, Codable, Hashable {
+    let id: Int
+    let title: String
+    let description: String?
+    let pricePerDay: Double
+    var isSelected: Bool
+    var quantity: Int
+    let type: ExtraServiceType
+}
+
+enum ExtraServiceType: String, Codable, Hashable {
+    case toggle
+    case quantity
+    case single
+}

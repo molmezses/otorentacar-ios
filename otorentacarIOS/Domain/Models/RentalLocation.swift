@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct RentalLocation: Identifiable, Codable, Hashable {
+    let id: Int
+    let name: String
+    let type: String
+}

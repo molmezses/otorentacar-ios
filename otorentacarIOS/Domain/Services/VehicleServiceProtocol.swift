@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+protocol VehicleServiceProtocol {
+    func fetchFeaturedVehicles() async throws -> [Vehicle]
+    func fetchVehicleSegments() async throws -> [VehicleSegment]
+    func searchVehicles(request: ReservationSearchRequest) async throws -> [Vehicle]
+}

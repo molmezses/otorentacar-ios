@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+protocol APIClient {
+    func request<T: Decodable>(_ endpoint: Endpoint, responseModel: T.Type) async throws -> T
+}
