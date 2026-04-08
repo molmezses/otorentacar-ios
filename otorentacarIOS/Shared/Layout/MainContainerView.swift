@@ -23,7 +23,7 @@ struct MainContainerView: View {
                             }
                         }
                     case .bookings:
-                        ReservationQueryPlaceholderView {
+                        BookingQueryView {
                             withAnimation(.spring()) {
                                 showMenu.toggle()
                             }

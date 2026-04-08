@@ -12,9 +12,9 @@ struct ReservationDetailView: View {
     @StateObject private var viewModel: ReservationDetailViewModel
     @Environment(\.dismiss) private var dismiss
     
-    init(draft: ReservationDraft) {
+    init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
         _viewModel = StateObject(
-            wrappedValue: ReservationDetailViewModel(draft: draft)
+            wrappedValue: ReservationDetailViewModel(draft: draft, mode: mode)
         )
     }
     
@@ -24,6 +24,14 @@ struct ReservationDetailView: View {
                 topBar
                 
                 titleSection
+                
+                if let trackingCode = viewModel.trackingCodeText,
+                   let status = viewModel.reservationStatusText {
+                    ReservationInfoBanner(
+                        trackingCode: trackingCode,
+                        status: status
+                    )
+                }
                 
                 ReservationVehicleCard(vehicle: viewModel.draft.vehicle)
                 
@@ -52,23 +60,25 @@ struct ReservationDetailView: View {
                     grandTotal: viewModel.grandTotal
                 )
                 
-                if let errorMessage = viewModel.errorMessage {
+                if let errorMessage = viewModel.errorMessage, !viewModel.isReadOnly {
                     Text(errorMessage)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.red)
                         .padding(.horizontal, 4)
                 }
                 
-                ORPrimaryButton(
-                    title: viewModel.isSubmitting ? "İşleniyor..." : "Rezervasyonu Tamamla",
-                    icon: "arrow.right"
-                ) {
-                    Task {
-                        await viewModel.submitReservation()
+                if !viewModel.isReadOnly {
+                    ORPrimaryButton(
+                        title: viewModel.actionButtonTitle,
+                        icon: "arrow.right"
+                    ) {
+                        Task {
+                            await viewModel.submitReservation()
+                        }
                     }
+                    .disabled(viewModel.isSubmitting)
+                    .opacity(viewModel.isSubmitting ? 0.7 : 1)
                 }
-                .disabled(viewModel.isSubmitting)
-                .opacity(viewModel.isSubmitting ? 0.7 : 1)
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
@@ -100,7 +110,7 @@ struct ReservationDetailView: View {
             
             Spacer()
             
-            Text("Rezervasyon Detayı")
+            Text(viewModel.screenTitle)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
@@ -114,11 +124,11 @@ struct ReservationDetailView: View {
     
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Rezervasyon Detayları")
+            Text(viewModel.heroTitle)
                 .font(.system(size: 30, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text("Bilgilerini doldurup rezervasyonu tamamlayabilirsin.")
+            Text(viewModel.heroSubtitle)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }
