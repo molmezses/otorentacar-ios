@@ -9,6 +9,14 @@ import Foundation
 
 final class MockReservationService: ReservationServiceProtocol {
     func fetchReservation(by trackingCode: String) async throws -> Reservation {
+        let trimmedCode = trackingCode.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        try await Task.sleep(nanoseconds: 800_000_000)
+        
+        guard !trimmedCode.isEmpty, trimmedCode.count >= 4 else {
+            throw APIError.invalidResponse
+        }
+        
         let vehicle = Vehicle(
             id: 11,
             name: "Golf",
@@ -27,14 +35,15 @@ final class MockReservationService: ReservationServiceProtocol {
         
         return Reservation(
             id: 1,
-            trackingCode: trackingCode,
+            trackingCode: trimmedCode,
             vehicle: vehicle,
             pickUpLocation: "Sabiha Gökçen Havalimanı",
             dropOffLocation: "Sabiha Gökçen Havalimanı",
             pickUpDate: Date(),
-            dropOffDate: Date().addingTimeInterval(60 * 60 * 24 * 3),
+            dropOffDate: Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date(),
             totalAmount: 5580,
             status: "Onaylandı"
         )
     }
 }
+
