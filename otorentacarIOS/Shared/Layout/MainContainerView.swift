@@ -1,0 +1,17 @@
+//
+//  MainContainerView.swift
+//  otorentacarIOS
+//
+//  Created by mustafaolmezses on 8.04.2026.
+//
+
+import SwiftUI
+
+struct MainContainerView: View {
+    var body : some View{
+        Text("asd")
+    }
+}
+
+
+
