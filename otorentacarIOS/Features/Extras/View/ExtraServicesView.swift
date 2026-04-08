@@ -1,5 +1,5 @@
 //
-//  VehicleListView.swift
+//  ExtraServicesView.swift
 //  otorentacarIOS
 //
 //  Created by mustafaolmezses on 8.04.2026.
@@ -8,16 +8,16 @@
 
 import SwiftUI
 
-struct VehicleListView: View {
-    @StateObject private var viewModel: VehicleListViewModel
+struct ExtraServicesView: View {
+    @StateObject private var viewModel: ExtraServicesViewModel
     @Environment(\.dismiss) private var dismiss
     
-    @State private var selectedVehicle: Vehicle?
-    @State private var navigateToExtras = false
-    
-    init(searchRequest: ReservationSearchRequest) {
+    init(vehicle: Vehicle, searchRequest: ReservationSearchRequest) {
         _viewModel = StateObject(
-            wrappedValue: VehicleListViewModel(searchRequest: searchRequest)
+            wrappedValue: ExtraServicesViewModel(
+                vehicle: vehicle,
+                searchRequest: searchRequest
+            )
         )
     }
     
@@ -27,29 +27,32 @@ struct VehicleListView: View {
             
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
-                    headerSection
+                    vehicleHeader
                     
-                    VehicleFilterBar(viewModel: viewModel)
+                    titleSection
                     
                     contentSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
-                .padding(.bottom, 30)
+                .padding(.bottom, 24)
             }
+            
+            ExtraSummaryBar(
+                vehicleTotal: viewModel.vehicle.totalPrice,
+                extrasTotal: viewModel.extrasTotal,
+                grandTotal: viewModel.grandTotal
+            ) {
+                print("Continue with extras")
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+            .background(AppColors.background)
         }
         .background(AppColors.background.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
         .task {
             viewModel.onAppear()
-        }
-        .navigationDestination(isPresented: $navigateToExtras) {
-            if let selectedVehicle {
-                ExtraServicesView(
-                    vehicle: selectedVehicle,
-                    searchRequest: viewModel.searchRequest
-                )
-            }
         }
     }
     
@@ -70,7 +73,7 @@ struct VehicleListView: View {
             
             Spacer()
             
-            Text("Araçlar")
+            Text("Ek Hizmetler")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
@@ -84,13 +87,44 @@ struct VehicleListView: View {
         .padding(.top, 16)
     }
     
-    private var headerSection: some View {
+    private var vehicleHeader: some View {
+        HStack(spacing: 16) {
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.white)
+                .frame(width: 110, height: 88)
+                .overlay(
+                    Image(systemName: "car.side.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 72)
+                        .foregroundColor(.gray.opacity(0.75))
+                )
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text("\(viewModel.vehicle.brand) \(viewModel.vehicle.name)")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(AppColors.textPrimary)
+                
+                Text(viewModel.vehicle.segment)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppColors.textSecondary)
+                
+                Text("\(viewModel.dayCount) gün kiralama")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppColors.primary)
+            }
+            
+            Spacer()
+        }
+    }
+    
+    private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("\(viewModel.vehicles.count) araç bulundu")
+            Text("Yolculuğunu Güçlendir")
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text("\(viewModel.searchRequest.pickUpLocation) • \(FormatterHelper.shortDate.string(from: viewModel.searchRequest.pickUpDate))")
+            Text("İhtiyacına uygun ek hizmetleri seçebilirsin.")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -101,11 +135,11 @@ struct VehicleListView: View {
         if viewModel.isLoading {
             VStack(spacing: 16) {
                 ProgressView()
-                Text("Araçlar yükleniyor...")
+                Text("Ek hizmetler yükleniyor...")
                     .foregroundColor(AppColors.textSecondary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.top, 60)
+            .padding(.top, 50)
         } else if let errorMessage = viewModel.errorMessage {
             VStack(spacing: 16) {
                 Text("Bir hata oluştu")
@@ -117,7 +151,7 @@ struct VehicleListView: View {
                 
                 Button("Tekrar Dene") {
                     Task {
-                        await viewModel.fetchVehicles()
+                        await viewModel.loadExtras()
                     }
                 }
                 .foregroundColor(.white)
@@ -127,24 +161,23 @@ struct VehicleListView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             .frame(maxWidth: .infinity)
-            .padding(.top, 60)
-        } else if viewModel.vehicles.isEmpty {
-            VStack(spacing: 10) {
-                Text("Araç bulunamadı")
-                    .font(.title3.bold())
-                
-                Text("Arama kriterlerinizi değiştirip tekrar deneyin.")
-                    .foregroundColor(AppColors.textSecondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.top, 60)
+            .padding(.top, 50)
         } else {
-            LazyVStack(spacing: 18) {
-                ForEach(viewModel.vehicles) { vehicle in
-                    VehicleListCard(vehicle: vehicle) {
-                        selectedVehicle = vehicle
-                        navigateToExtras = true
-                    }
+            LazyVStack(spacing: 16) {
+                ForEach(viewModel.extraServices) { item in
+                    ExtraServiceCard(
+                        item: item,
+                        dayCount: viewModel.dayCount,
+                        onToggle: {
+                            viewModel.toggleSelection(for: item)
+                        },
+                        onIncrease: {
+                            viewModel.increaseQuantity(for: item)
+                        },
+                        onDecrease: {
+                            viewModel.decreaseQuantity(for: item)
+                        }
+                    )
                 }
             }
         }
