@@ -28,14 +28,8 @@ struct MainContainerView: View {
                                 showMenu.toggle()
                             }
                         }
-                    case .search:
-                        VehicleSearchPlaceholderView {
-                            withAnimation(.spring()) {
-                                showMenu.toggle()
-                            }
-                        }
                     case .contact:
-                        ContactPlaceholderView {
+                        ContactView {
                             withAnimation(.spring()) {
                                 showMenu.toggle()
                             }
@@ -60,13 +54,46 @@ struct MainContainerView: View {
                         }
                     }
                 
-                SideMenuView {
-                    withAnimation(.spring()) {
-                        showMenu = false
+                SideMenuView(
+                    selectedDestination: sideMenuDestination(from: selectedTab),
+                    onItemTap: { destination in
+                        handleMenuSelection(destination)
+                    },
+                    closeAction: {
+                        withAnimation(.spring()) {
+                            showMenu = false
+                        }
                     }
-                }
+                )
                 .transition(.move(edge: .leading))
             }
+        }
+    }
+    
+    private func sideMenuDestination(from tab: AppTab) -> SideMenuDestination {
+        switch tab {
+        case .home:
+            return .home
+        case .bookings:
+            return .bookings
+        case .contact:
+            return .contact
+        }
+    }
+    
+    private func handleMenuSelection(_ destination: SideMenuDestination) {
+        withAnimation(.spring()) {
+            switch destination {
+            case .home:
+                selectedTab = .home
+            case .bookings:
+                selectedTab = .bookings
+            case .contact:
+                selectedTab = .contact
+            case .about, .services, .faq, .blog:
+                break
+            }
+            showMenu = false
         }
     }
 }

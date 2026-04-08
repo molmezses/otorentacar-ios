@@ -9,15 +9,17 @@ import SwiftUI
 
 struct SideMenuView: View {
     let items: [SideMenuItem] = [
-        .init(title: "Anasayfa", icon: "house.fill"),
-        .init(title: "Rezervasyonlarım", icon: "car.fill"),
-        .init(title: "Hakkımızda", icon: "info.circle.fill"),
-        .init(title: "Hizmetlerimiz", icon: "cross.case.fill"),
-        .init(title: "S.S.S", icon: "questionmark.square.fill"),
-        .init(title: "Blog", icon: "newspaper.fill"),
-        .init(title: "İletişim", icon: "at")
+        .init(title: "Anasayfa", icon: "house.fill", destination: .home),
+        .init(title: "Rezervasyonlarım", icon: "car.fill", destination: .bookings),
+        .init(title: "Hakkımızda", icon: "info.circle.fill", destination: .about),
+        .init(title: "Hizmetlerimiz", icon: "cross.case.fill", destination: .services),
+        .init(title: "S.S.S", icon: "questionmark.square.fill", destination: .faq),
+        .init(title: "Blog", icon: "newspaper.fill", destination: .blog),
+        .init(title: "İletişim", icon: "at", destination: .contact)
     ]
     
+    let selectedDestination: SideMenuDestination
+    var onItemTap: (SideMenuDestination) -> Void
     var closeAction: () -> Void
     
     var body: some View {
@@ -26,19 +28,31 @@ struct SideMenuView: View {
             
             VStack(alignment: .leading, spacing: 18) {
                 ForEach(items) { item in
-                    HStack(spacing: 16) {
-                        Image(systemName: item.icon)
-                            .frame(width: 28)
-                            .foregroundColor(item.title == "Anasayfa" ? AppColors.primary : AppColors.textSecondary)
-                        
-                        Text(item.title)
-                            .font(.system(size: 20, weight: item.title == "Anasayfa" ? .semibold : .regular))
-                            .foregroundColor(item.title == "Anasayfa" ? AppColors.primary : AppColors.textSecondary)
+                    Button {
+                        onItemTap(item.destination)
+                    } label: {
+                        HStack(spacing: 16) {
+                            Image(systemName: item.icon)
+                                .frame(width: 28)
+                                .foregroundColor(
+                                    selectedDestination == item.destination
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary
+                                )
+                            
+                            Text(item.title)
+                                .font(.system(size: 20, weight: selectedDestination == item.destination ? .semibold : .regular))
+                                .foregroundColor(
+                                    selectedDestination == item.destination
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary
+                                )
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(selectedDestination == item.destination ? AppColors.primarySoft : .clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(item.title == "Anasayfa" ? AppColors.primarySoft : .clear)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
             }
             
