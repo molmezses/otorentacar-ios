@@ -67,23 +67,33 @@ struct BookingQueryView: View {
     }
     
     private var imageSection: some View {
-        RoundedRectangle(cornerRadius: 28)
-            .fill(Color.white)
-            .frame(height: 220)
-            .overlay(
-                VStack(spacing: 16) {
+        HStack(spacing: 16) {
+            RoundedRectangle(cornerRadius: 18)
+                .fill(AppColors.primarySoft)
+                .frame(width: 64, height: 64)
+                .overlay(
                     Image(systemName: "doc.text.magnifyingglass")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 74)
+                        .font(.system(size: 28, weight: .semibold))
                         .foregroundColor(AppColors.primary)
-                    
-                    Text("Kodunu gir, rezervasyonunu görüntüle")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(AppColors.textPrimary)
-                }
-            )
-            .shadow(color: AppColors.shadow, radius: 12, x: 0, y: 6)
+                )
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Rezervasyon Takibi")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(AppColors.textPrimary)
+                
+                Text("Kodunu girerek mevcut rezervasyon detaylarını görüntüleyebilirsin.")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppColors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer()
+        }
+        .padding(18)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .shadow(color: AppColors.shadow, radius: 10, x: 0, y: 6)
     }
     
     private var infoSection: some View {
