@@ -22,39 +22,7 @@ struct SideMenuView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
-            HStack(alignment: .top) {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.black.opacity(0.85))
-                    .frame(width: 92, height: 92)
-                    .overlay(
-                        Image(systemName: "person.fill")
-                            .foregroundColor(.white)
-                            .font(.system(size: 30))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(AppColors.primary, lineWidth: 2)
-                    )
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Hoş Geldiniz,\nMisafir")
-                        .font(.system(size: 24, weight: .bold))
-                    Text("Giriş Yap / Kaydol")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(AppColors.primary)
-                }
-                
-                Spacer()
-                
-                Button(action: closeAction) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(AppColors.textSecondary)
-                }
-            }
-            
-            Text("Otorentacar")
-                .font(.system(size: 28, weight: .bold))
+            topSection
             
             VStack(alignment: .leading, spacing: 18) {
                 ForEach(items) { item in
@@ -80,10 +48,52 @@ struct SideMenuView: View {
         .frame(maxWidth: 320, maxHeight: .infinity, alignment: .topLeading)
         .background(Color.white)
     }
-}
-
-#Preview {
-    SideMenuView(closeAction: {
-        
-    })
+    
+    private var topSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .top) {
+                logoView
+                
+                Spacer()
+                
+                Button(action: closeAction) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundColor(AppColors.textSecondary)
+                }
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Otorentacar")
+                    .font(.system(size: 30, weight: .bold))
+                    .foregroundColor(AppColors.textPrimary)
+                
+                Text("Hoş geldiniz")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(AppColors.primary)
+                
+                Text("Araç kiralama işlemlerini hızlı ve kolay şekilde yönetebilirsiniz.")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundColor(AppColors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+    
+    private var logoView: some View {
+        RoundedRectangle(cornerRadius: 22)
+            .fill(AppColors.primarySoft)
+            .frame(width: 84, height: 84)
+            .overlay(
+                Image(systemName: "car.side.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 42)
+                    .foregroundColor(AppColors.primary)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22)
+                    .stroke(AppColors.primary.opacity(0.15), lineWidth: 1.5)
+            )
+    }
 }
