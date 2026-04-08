@@ -22,9 +22,11 @@ final class ReservationDetailViewModel: ObservableObject {
     @Published var showSuccessMessage: Bool = false
     
     let draft: ReservationDraft
+    let mode: ReservationDetailMode
     
-    init(draft: ReservationDraft) {
+    init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
         self.draft = draft
+        self.mode = mode
         self.fullName = draft.customerInfo.fullName
         self.phone = draft.customerInfo.phone
         self.birthDate = draft.customerInfo.birthDate
@@ -74,6 +76,62 @@ final class ReservationDetailViewModel: ObservableObject {
         email.contains("@")
     }
     
+    var isReadOnly: Bool {
+        if case .view = mode {
+            return true
+        }
+        return false
+    }
+    
+    var screenTitle: String {
+        switch mode {
+        case .create:
+            return "Rezervasyon Detayı"
+        case .view:
+            return "Rezervasyon Bilgileri"
+        }
+    }
+    
+    var heroTitle: String {
+        switch mode {
+        case .create:
+            return "Rezervasyon Detayları"
+        case .view:
+            return "Rezervasyonun Hazır"
+        }
+    }
+    
+    var heroSubtitle: String {
+        switch mode {
+        case .create:
+            return "Bilgilerini doldurup rezervasyonu tamamlayabilirsin."
+        case .view:
+            return "Mevcut rezervasyon bilgilerini aşağıda görüntüleyebilirsin."
+        }
+    }
+    
+    var actionButtonTitle: String {
+        isSubmitting ? "İşleniyor..." : "Rezervasyonu Tamamla"
+    }
+    
+    var reservationStatusText: String? {
+        switch mode {
+        case .create:
+            return nil
+        case .view(let reservation):
+            return reservation.status
+        }
+    }
+    
+    var trackingCodeText: String? {
+        switch mode {
+        case .create:
+            return nil
+        case .view(let reservation):
+            return reservation.trackingCode
+        }
+    }
+    
     func buildUpdatedDraft() -> ReservationDraft {
         ReservationDraft(
             vehicle: draft.vehicle,
@@ -90,6 +148,8 @@ final class ReservationDetailViewModel: ObservableObject {
     }
     
     func submitReservation() async {
+        guard !isReadOnly else { return }
+        
         guard isFormValid else {
             errorMessage = "Lütfen gerekli alanları doğru şekilde doldurun."
             return

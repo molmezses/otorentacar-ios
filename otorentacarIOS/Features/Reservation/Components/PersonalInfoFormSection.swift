@@ -34,8 +34,9 @@ struct PersonalInfoFormSection: View {
                             .padding()
                             .frame(height: 58)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppColors.inputBackground)
+                            .background(viewModel.isReadOnly ? Color.gray.opacity(0.12) : AppColors.inputBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .disabled(viewModel.isReadOnly)
                     }
                 }
                 
@@ -71,7 +72,8 @@ struct PersonalInfoFormSection: View {
         TextField(placeholder, text: text)
             .padding()
             .frame(height: 58)
-            .background(AppColors.inputBackground)
+            .background(viewModel.isReadOnly ? Color.gray.opacity(0.12) : AppColors.inputBackground)
             .clipShape(RoundedRectangle(cornerRadius: 16))
+            .disabled(viewModel.isReadOnly)
     }
 }

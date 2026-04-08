@@ -45,7 +45,10 @@ struct BookingQueryView: View {
             .background(AppColors.background)
             .navigationDestination(isPresented: $viewModel.navigateToDetail) {
                 if let reservation = viewModel.foundReservation {
-                    ReservationDetailView(draft: reservation.toDraft())
+                    ReservationDetailView(
+                        draft: reservation.toDraft(),
+                        mode: .view(reservation)
+                    )
                 }
             }
         }
