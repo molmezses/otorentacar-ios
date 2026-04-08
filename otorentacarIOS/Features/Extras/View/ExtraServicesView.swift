@@ -12,6 +12,8 @@ struct ExtraServicesView: View {
     @StateObject private var viewModel: ExtraServicesViewModel
     @Environment(\.dismiss) private var dismiss
     
+    @State private var navigateToReservationDetail = false
+    
     init(vehicle: Vehicle, searchRequest: ReservationSearchRequest) {
         _viewModel = StateObject(
             wrappedValue: ExtraServicesViewModel(
@@ -43,7 +45,7 @@ struct ExtraServicesView: View {
                 extrasTotal: viewModel.extrasTotal,
                 grandTotal: viewModel.grandTotal
             ) {
-                print("Continue with extras")
+                navigateToReservationDetail = true
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
@@ -53,6 +55,15 @@ struct ExtraServicesView: View {
         .navigationBarBackButtonHidden(true)
         .task {
             viewModel.onAppear()
+        }
+        .navigationDestination(isPresented: $navigateToReservationDetail) {
+            ReservationDetailView(
+                draft: ReservationDraft(
+                    vehicle: viewModel.vehicle,
+                    searchRequest: viewModel.searchRequest,
+                    extras: viewModel.selectedExtras
+                )
+            )
         }
     }
     
