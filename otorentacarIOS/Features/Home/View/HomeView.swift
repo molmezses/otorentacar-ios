@@ -56,9 +56,9 @@ struct HomeView: View {
                         ORSectionHeader(title: "Araç Segmentleri")
                         
                         LazyVGrid(columns: [
-                            GridItem(.flexible()),
-                            GridItem(.flexible())
-                        ], spacing: 16) {
+                            GridItem(.flexible(), spacing: 14),
+                            GridItem(.flexible(), spacing: 14)
+                        ], spacing: 14) {
                             ForEach(viewModel.segments) { segment in
                                 SegmentCard(segment: segment)
                             }

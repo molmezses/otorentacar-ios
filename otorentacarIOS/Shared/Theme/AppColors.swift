@@ -15,9 +15,9 @@ enum AppColors {
     static let background = Color(hex: "#F5F5F5")
     static let card = Color.white
     static let textPrimary = Color(hex: "#111111")
-    static let textSecondary = Color(hex: "#6E6E6E")
-    static let textTertiary = Color(hex: "#A6A6A6")
-    static let border = Color(hex: "#E8E8E8")
+    static let textSecondary = Color(hex: "#6B6B6B")
+    static let textTertiary = Color(hex: "#8F8F8F")
+    static let border = Color(hex: "#E3E3E3")
     static let inputBackground = Color(hex: "#F1F1F1")
     static let shadow = Color.black.opacity(0.06)
 }

@@ -48,6 +48,10 @@ struct PersonalInfoFormSection: View {
                 fieldTitle("Uçuş Kodu (Opsiyonel)")
                 textField("TK 1923", text: $viewModel.flightCode)
             }
+            .padding(18)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .shadow(color: AppColors.shadow, radius: 10, x: 0, y: 6)
         }
     }
     

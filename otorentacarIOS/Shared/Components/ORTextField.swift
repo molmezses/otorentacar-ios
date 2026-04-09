@@ -23,10 +23,20 @@ struct ORTextField: View {
                 if let icon {
                     Image(systemName: icon)
                         .foregroundColor(AppColors.primary)
+                        .font(.system(size: 18, weight: .semibold))
                 }
                 
-                TextField(placeholder, text: $text)
-                    .foregroundColor(AppColors.textPrimary)
+                ZStack(alignment: .leading) {
+                    if text.isEmpty {
+                        Text(placeholder)
+                            .foregroundColor(AppColors.textTertiary.opacity(0.9))
+                            .font(.system(size: 18, weight: .medium))
+                    }
+                    
+                    TextField("", text: $text)
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(AppColors.textPrimary)
+                }
             }
             .padding()
             .frame(height: 58)
