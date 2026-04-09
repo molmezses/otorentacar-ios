@@ -20,7 +20,6 @@ enum SideMenuDestination: Hashable {
     case about
     case services
     case faq
-    case blog
     case contact
 }
 

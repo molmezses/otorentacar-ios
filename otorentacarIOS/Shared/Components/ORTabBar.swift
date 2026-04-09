@@ -11,39 +11,44 @@ struct ORTabBar: View {
     @Binding var selectedTab: AppTab
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 Button {
                     selectedTab = tab
                 } label: {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 6) {
                         ZStack {
-                            if selectedTab == tab {
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(AppColors.primarySoft)
-                                    .frame(width: 72, height: 52)
-                            }
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(AppColors.primarySoft)
+                                .frame(width: 64, height: 46)
+                                .opacity(selectedTab == tab ? 1 : 0)
                             
                             Image(systemName: tab.icon)
-                                .font(.system(size: 22, weight: .medium))
+                                .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(selectedTab == tab ? AppColors.primary : Color.gray)
                         }
+                        .frame(height: 46)
                         
                         Text(tab.title)
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.system(size: 10, weight: .medium))
                             .foregroundColor(selectedTab == tab ? AppColors.primary : Color.gray)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
                     }
                     .frame(maxWidth: .infinity)
+                    .frame(height: 68)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 14)
-        .padding(.bottom, 18)
+        .padding(.horizontal, 14)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
         .background(
-            RoundedRectangle(cornerRadius: 28)
+            RoundedRectangle(cornerRadius: 26)
                 .fill(.white)
-                .shadow(color: AppColors.shadow, radius: 16, x: 0, y: -2)
+                .shadow(color: AppColors.shadow, radius: 14, x: 0, y: -2)
         )
     }
 }

@@ -47,28 +47,89 @@ struct FeaturedVehicleCard: View {
                         .foregroundColor(.gray.opacity(0.7))
                 )
             
-            HStack(spacing: 14) {
-                Label(vehicle.transmission, systemImage: "gearshape.fill")
-                Label(vehicle.fuelType, systemImage: "fuelpump.fill")
+            HStack(alignment: .bottom) {
+                HStack(spacing: 6) {
+                    vehicleSpecBadge(icon: "gearshape.fill", title: vehicle.transmission)
+                    vehicleSpecBadge(icon: "fuelpump.fill", title: vehicle.fuelType)
+                }
                 
-                Spacer()
+                Spacer(minLength: 12)
                 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("Günlük")
-                        .font(.system(size: 14))
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                     
                     Text(FormatterHelper.currency.string(from: NSNumber(value: vehicle.dailyPrice)) ?? "₺0")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.primary)
+                        .lineLimit(1)
                 }
             }
-            .font(.system(size: 14, weight: .medium))
-            .foregroundColor(AppColors.textSecondary)
         }
         .padding(18)
         .frame(width: 300)
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 28))
     }
+}
+
+@ViewBuilder
+private func vehicleSpecBadge(icon: String, title: String) -> some View {
+    HStack(spacing: 4) {
+        Image(systemName: icon)
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundColor(AppColors.primary)
+        
+        Text(formattedSpecTitle(title))
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundColor(AppColors.primaryDark)
+            .fixedSize(horizontal: true, vertical: false)
+    }
+    .padding(.horizontal, 8)
+    .frame(height: 28)
+    .background(AppColors.primarySoft)
+    .clipShape(Capsule())
+}
+
+private func formattedSpecTitle(_ value: String) -> String {
+    let cleaned = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    let lowercased = cleaned.lowercased()
+    
+    switch lowercased {
+    case "automatic", "auto", "otomatik":
+        return "Auto"
+    case "manual", "manuel":
+        return "Manuel"
+    case "diesel", "dizel":
+        return "Dizel"
+    case "gasoline", "petrol", "benzin", "benzinli":
+        return "Benzin"
+    case "hybrid", "hibrit":
+        return "Hybrid"
+    case "electric", "elektrik", "elektrikli":
+        return "Elektrik"
+    default:
+        if let firstWord = cleaned.split(separator: " ").first {
+            let short = String(firstWord)
+            return short.count > 8 ? String(short.prefix(8)) : short
+        }
+        return cleaned.count > 8 ? String(cleaned.prefix(8)) : cleaned
+    }
+}
+
+private func normalizedSpecText(_ value: String) -> String {
+    let cleaned = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    
+    if cleaned.count <= 10 {
+        return cleaned
+    }
+    
+    let words = cleaned.split(separator: " ")
+    if let first = words.first {
+        let firstWord = String(first)
+        return firstWord.count <= 10 ? firstWord : String(firstWord.prefix(10))
+    }
+    
+    return String(cleaned.prefix(10))
 }

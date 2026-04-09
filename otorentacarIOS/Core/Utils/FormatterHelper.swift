@@ -36,4 +36,11 @@ enum FormatterHelper {
         formatter.dateFormat = "dd MMM yyyy"
         return formatter
     }()
+    
+    static let timeString: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
 }

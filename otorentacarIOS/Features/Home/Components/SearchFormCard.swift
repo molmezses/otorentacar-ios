@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct SearchFormCard: View {
     @ObservedObject var viewModel: HomeViewModel
     var searchAction: () -> Void
@@ -21,13 +20,16 @@ struct SearchFormCard: View {
                 icon: "location.fill"
             )
             
-            Toggle(isOn: $viewModel.dropOffDifferentLocation) {
+            HStack {
                 Text("Farklı bir yerde bırak")
-                    .font(.system(size: 18, weight: .regular))
+                    .font(.system(size: 18, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
+                
+                Spacer()
+                
+                ORSwitchToggle(isOn: $viewModel.dropOffDifferentLocation)
             }
-            .tint(AppColors.primary)
-            
+
             if viewModel.dropOffDifferentLocation {
                 ORTextField(
                     title: "Drop-off Location",
@@ -36,32 +38,30 @@ struct SearchFormCard: View {
                     icon: "paperplane.fill"
                 )
             }
-            
-            HStack(spacing: 14) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("PICK-UP DATE")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(AppColors.textSecondary)
+
+            VStack(spacing: 14) {
+                HStack(spacing: 14) {
+                    ORDateField(
+                        title: "Pick-up Date",
+                        date: $viewModel.pickUpDate
+                    )
                     
-                    DatePicker("", selection: $viewModel.pickUpDate, displayedComponents: .date)
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .frame(height: 58)
-                        .background(AppColors.inputBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    ORTimePickerField(
+                        title: "Pick-up Time",
+                        time: $viewModel.pickUpTime
+                    )
                 }
                 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("PICK-UP TIME")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(AppColors.textSecondary)
+                HStack(spacing: 14) {
+                    ORDateField(
+                        title: "Drop-off Date",
+                        date: $viewModel.dropOffDate
+                    )
                     
-                    TextField("10:00", text: $viewModel.pickUpTime)
-                        .padding()
-                        .frame(height: 58)
-                        .background(AppColors.inputBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    ORTimePickerField(
+                        title: "Drop-off Time",
+                        time: $viewModel.dropOffTime
+                    )
                 }
             }
             
@@ -73,7 +73,3 @@ struct SearchFormCard: View {
         .shadow(color: AppColors.shadow, radius: 18, x: 0, y: 8)
     }
 }
-
-//#Preview {
-//    SearchFormCard()
-//}
