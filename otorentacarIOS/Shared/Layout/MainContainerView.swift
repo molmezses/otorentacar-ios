@@ -10,37 +10,40 @@ import SwiftUI
 struct MainContainerView: View {
     @State private var selectedTab: AppTab = .home
     @State private var showMenu = false
+    @State private var selectedMenuDestination: SideMenuDestination? = nil
     
     var body: some View {
         ZStack(alignment: .leading) {
             VStack(spacing: 0) {
                 Group {
-                    switch selectedTab {
-                    case .home:
-                        HomeView {
-                            withAnimation(.spring()) {
-                                showMenu.toggle()
+                    if let selectedMenuDestination {
+                        switch selectedMenuDestination {
+                        case .about:
+                            AboutView {
+                                withAnimation(.spring()) {
+                                    showMenu.toggle()
+                                }
                             }
-                        }
-                    case .bookings:
-                        BookingQueryView {
-                            withAnimation(.spring()) {
-                                showMenu.toggle()
+                        case .services:
+                            ServicesView {
+                                withAnimation(.spring()) {
+                                    showMenu.toggle()
+                                }
                             }
+                        case .home, .bookings, .contact, .faq:
+                            tabContentView
                         }
-                    case .contact:
-                        ContactView {
-                            withAnimation(.spring()) {
-                                showMenu.toggle()
-                            }
-                        }
+                    } else {
+                        tabContentView
                     }
                 }
                 
-                ORTabBar(selectedTab: $selectedTab)
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 8)
-                    .background(AppColors.background)
+                if selectedMenuDestination == nil {
+                    ORTabBar(selectedTab: $selectedTab)
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 8)
+                        .background(AppColors.background)
+                }
             }
             .background(AppColors.background.ignoresSafeArea())
             .disabled(showMenu)
@@ -55,7 +58,7 @@ struct MainContainerView: View {
                     }
                 
                 SideMenuView(
-                    selectedDestination: sideMenuDestination(from: selectedTab),
+                    selectedDestination: currentMenuDestination,
                     onItemTap: { destination in
                         handleMenuSelection(destination)
                     },
@@ -70,8 +73,36 @@ struct MainContainerView: View {
         }
     }
     
-    private func sideMenuDestination(from tab: AppTab) -> SideMenuDestination {
-        switch tab {
+    @ViewBuilder
+    private var tabContentView: some View {
+        switch selectedTab {
+        case .home:
+            HomeView {
+                withAnimation(.spring()) {
+                    showMenu.toggle()
+                }
+            }
+        case .bookings:
+            BookingQueryView {
+                withAnimation(.spring()) {
+                    showMenu.toggle()
+                }
+            }
+        case .contact:
+            ContactView {
+                withAnimation(.spring()) {
+                    showMenu.toggle()
+                }
+            }
+        }
+    }
+    
+    private var currentMenuDestination: SideMenuDestination {
+        if let selectedMenuDestination {
+            return selectedMenuDestination
+        }
+        
+        switch selectedTab {
         case .home:
             return .home
         case .bookings:
@@ -85,13 +116,20 @@ struct MainContainerView: View {
         withAnimation(.spring()) {
             switch destination {
             case .home:
+                selectedMenuDestination = nil
                 selectedTab = .home
             case .bookings:
+                selectedMenuDestination = nil
                 selectedTab = .bookings
             case .contact:
+                selectedMenuDestination = nil
                 selectedTab = .contact
-            case .about, .services, .faq, .blog:
-                break
+            case .about:
+                selectedMenuDestination = .about
+            case .services:
+                selectedMenuDestination = .services
+            case .faq:
+                selectedMenuDestination = .faq
             }
             showMenu = false
         }

@@ -14,7 +14,6 @@ struct SideMenuView: View {
         .init(title: "Hakkımızda", icon: "info.circle.fill", destination: .about),
         .init(title: "Hizmetlerimiz", icon: "cross.case.fill", destination: .services),
         .init(title: "S.S.S", icon: "questionmark.square.fill", destination: .faq),
-        .init(title: "Blog", icon: "newspaper.fill", destination: .blog),
         .init(title: "İletişim", icon: "at", destination: .contact)
     ]
     
