@@ -34,20 +34,29 @@ final class HomeViewModel: ObservableObject {
     }()
 
     private let vehicleService: VehicleServiceProtocol
+    
+    private let authService: AuthServiceProtocol = AuthAPIService()
+
+
 
     init(vehicleService: VehicleServiceProtocol) {
         self.vehicleService = vehicleService
     }
 
+    
     convenience init() {
         self.init(vehicleService: MockVehicleService())
     }
+    
+    
 
     func onAppear() {
         Task {
             await loadHomeData()
         }
     }
+    
+    
 
     func loadHomeData() async {
         isLoading = true
@@ -76,4 +85,7 @@ final class HomeViewModel: ObservableObject {
             dropOffTime: FormatterHelper.timeString.string(from: dropOffTime)
         )
     }
+    
+    
+    
 }
