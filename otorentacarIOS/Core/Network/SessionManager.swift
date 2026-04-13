@@ -18,6 +18,7 @@ final class SessionManager: ObservableObject {
     private let authService: AuthServiceProtocol
     private let tokenStore: TokenStoreProtocol
     
+    
     init(
         authService: AuthServiceProtocol = AuthAPIService(),
         tokenStore: TokenStoreProtocol = InMemoryTokenStore.shared
@@ -45,6 +46,7 @@ final class SessionManager: ObservableObject {
             tokenStore.save(token: token)
             isReady = true
             print("SESSION: token alındı")
+            
         } catch {
             errorMessage = error.localizedDescription
             print("SESSION HATASI:", error.localizedDescription)

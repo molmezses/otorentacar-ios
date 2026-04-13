@@ -19,13 +19,12 @@ final class AuthAPIService: AuthServiceProtocol {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        
-        let username = AppConfig.apiUsername.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let password = AppConfig.apiPassword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        
-        let bodyString = "username=\(username)&password=\(password)"
-        request.httpBody = bodyString.data(using: .utf8)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        
+        request.httpBody = FormURLEncoder.encode([
+            "username": AppConfig.apiUsername,
+            "password": AppConfig.apiPassword
+        ])
         
         let (data, response) = try await URLSession.shared.data(for: request)
         

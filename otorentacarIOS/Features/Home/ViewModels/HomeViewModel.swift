@@ -37,6 +37,19 @@ final class HomeViewModel: ObservableObject {
     
     private let authService: AuthServiceProtocol = AuthAPIService()
 
+    private let locationService: LocationServiceProtocol = LocationAPIService()
+
+    func testLocations() {
+        Task {
+            do {
+                let locations = try await locationService.fetchLocations()
+                print("LOCATION COUNT:", locations.count)
+                print("FIRST LOCATION:", locations.first?.name ?? "Yok")
+            } catch {
+                print("LOCATION ERROR:", error.localizedDescription)
+            }
+        }
+    }
 
 
     init(vehicleService: VehicleServiceProtocol) {
@@ -51,6 +64,8 @@ final class HomeViewModel: ObservableObject {
     
 
     func onAppear() {
+        
+        testLocations()
         Task {
             await loadHomeData()
         }
