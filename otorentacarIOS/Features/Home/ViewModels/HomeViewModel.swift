@@ -10,8 +10,9 @@ import Combine
 
 @MainActor
 final class HomeViewModel: ObservableObject {
-    @Published var pickUpLocation: String = ""
-    @Published var dropOffLocation: String = ""
+    @Published var selectedPickUpLocation: LocationDTO?
+    @Published var selectedDropOffLocation: LocationDTO?
+    @Published var availableLocations: [LocationDTO] = []
     @Published var pickUpDate: Date = Date()
     @Published var dropOffDate: Date = Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date()
     @Published var pickUpTime: Date = {
@@ -37,36 +38,29 @@ final class HomeViewModel: ObservableObject {
     
     private let authService: AuthServiceProtocol = AuthAPIService()
 
-    private let locationService: LocationServiceProtocol = LocationAPIService()
-
-    func testLocations() {
-        Task {
-            do {
-                let locations = try await locationService.fetchLocations()
-                print("LOCATION COUNT:", locations.count)
-                print("FIRST LOCATION:", locations.first?.name ?? "Yok")
-            } catch {
-                print("LOCATION ERROR:", error.localizedDescription)
-            }
-        }
-    }
+    private let locationService: LocationServiceProtocol
 
 
-    init(vehicleService: VehicleServiceProtocol) {
+    init(
+        vehicleService: VehicleServiceProtocol,
+        locationService: LocationServiceProtocol
+    ) {
         self.vehicleService = vehicleService
+        self.locationService = locationService
     }
 
     
     convenience init() {
-        self.init(vehicleService: MockVehicleService())
+        self.init(
+            vehicleService: MockVehicleService(),
+            locationService: LocationAPIService()
+        )
     }
-    
     
 
     func onAppear() {
-        
-        testLocations()
         Task {
+            await loadLocations()
             await loadHomeData()
         }
     }
@@ -89,11 +83,30 @@ final class HomeViewModel: ObservableObject {
 
         isLoading = false
     }
+    
+    func loadLocations() async {
+        do {
+            let locations = try await locationService.fetchLocations()
+            self.availableLocations = locations
+            
+            if selectedPickUpLocation == nil {
+                selectedPickUpLocation = locations.first
+            }
+            
+            if selectedDropOffLocation == nil {
+                selectedDropOffLocation = locations.first
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 
     func buildSearchRequest() -> ReservationSearchRequest {
         ReservationSearchRequest(
-            pickUpLocation: pickUpLocation,
-            dropOffLocation: dropOffDifferentLocation ? dropOffLocation : pickUpLocation,
+            pickUpLocation: selectedPickUpLocation?.name ?? "",
+            dropOffLocation: dropOffDifferentLocation
+                ? (selectedDropOffLocation?.name ?? "")
+                : (selectedPickUpLocation?.name ?? ""),
             pickUpDate: pickUpDate,
             dropOffDate: dropOffDate,
             pickUpTime: FormatterHelper.timeString.string(from: pickUpTime),

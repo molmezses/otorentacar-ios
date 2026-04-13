@@ -17,7 +17,7 @@ struct LocationResponseData: Codable {
     let list: [LocationDTO]?
 }
 
-struct LocationDTO: Codable {
+struct LocationDTO: Codable, Hashable {
     let id: Int
     let name: String
     let type: LocationTypeDTO?
@@ -25,12 +25,12 @@ struct LocationDTO: Codable {
     let area: LocationAreaDTO?
 }
 
-struct LocationTypeDTO: Codable {
+struct LocationTypeDTO: Codable, Hashable {
     let id: Int
     let name: String
 }
 
-struct LocationAreaDTO: Codable {
+struct LocationAreaDTO: Codable, Hashable {
     let id: Int
     let name: String
 }

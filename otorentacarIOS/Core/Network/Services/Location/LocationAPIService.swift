@@ -40,10 +40,7 @@ final class LocationAPIService: LocationServiceProtocol {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        if let rawString = String(data: data, encoding: .utf8) {
-            print("RAW LOCATIONS RESPONSE:")
-            print(rawString)
-        }
+        
         
         guard let httpResponse = response as? HTTPURLResponse,
               200..<300 ~= httpResponse.statusCode else {

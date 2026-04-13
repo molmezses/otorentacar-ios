@@ -13,11 +13,11 @@ struct SearchFormCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            ORTextField(
+            ORLocationPickerField(
                 title: "Pick-up Location",
                 placeholder: "Şehir veya Havalimanı",
-                text: $viewModel.pickUpLocation,
-                icon: "location.fill"
+                locations: viewModel.availableLocations,
+                selectedLocation: $viewModel.selectedPickUpLocation
             )
             
             HStack {
@@ -31,11 +31,11 @@ struct SearchFormCard: View {
             }
 
             if viewModel.dropOffDifferentLocation {
-                ORTextField(
+                ORLocationPickerField(
                     title: "Drop-off Location",
                     placeholder: "Dönüş Lokasyonu",
-                    text: $viewModel.dropOffLocation,
-                    icon: "paperplane.fill"
+                    locations: viewModel.availableLocations,
+                    selectedLocation: $viewModel.selectedDropOffLocation
                 )
             }
 
