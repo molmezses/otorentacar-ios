@@ -10,16 +10,18 @@ import Foundation
 extension Reservation {
     func toDraft() -> ReservationDraft {
         ReservationDraft(
-            vehicle: vehicle,
-            searchRequest: ReservationSearchRequest(
-                pickUpLocation: pickUpLocation,
-                dropOffLocation: dropOffLocation,
-                pickUpDate: pickUpDate,
-                dropOffDate: dropOffDate,
-                pickUpTime: "10:00",
-                dropOffTime: "10:00"
-            ),
-            extras: []
+            pickUpLocation: nil,
+            dropOffLocation: nil,
+            pickUpDate: pickUpDate,
+            pickUpTime: pickUpDate,
+            dropOffDate: dropOffDate,
+            dropOffTime: dropOffDate,
+            selectedVehicle: vehicle,
+            selectedVehicleModelId: vehicle.id,
+            currencyId: nil,
+            currencyCode: nil,
+            selectedExtras: [],
+            customerInfo: CustomerInfo()
         )
     }
 }

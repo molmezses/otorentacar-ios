@@ -10,8 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var navigateToVehicleList = false
-    @State private var searchRequest: ReservationSearchRequest?
-    
+    @State private var reservationDraft: ReservationDraft?
     var onMenuTap: () -> Void
     
     var body: some View {
@@ -31,16 +30,18 @@ struct HomeView: View {
                     }
                     
                     SearchFormCard(viewModel: viewModel) {
-                        let request = viewModel.buildSearchRequest()
-                        searchRequest = request
-                        navigateToVehicleList = true
+                        if let draft = viewModel.buildReservationDraft() {
+                            reservationDraft = draft
+                            navigateToVehicleList = true
+                        }
                     }
                     
                     VStack(spacing: 18) {
                         ORSectionHeader(title: "Öne Çıkan Kiralık Araçlar", actionTitle: "Tümünü Gör") {
-                            let request = viewModel.buildSearchRequest()
-                            searchRequest = request
-                            navigateToVehicleList = true
+                            if let draft = viewModel.buildReservationDraft() {
+                                reservationDraft = draft
+                                navigateToVehicleList = true
+                            }
                         }
                         
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -74,8 +75,8 @@ struct HomeView: View {
                 viewModel.onAppear()
             }
             .navigationDestination(isPresented: $navigateToVehicleList) {
-                if let searchRequest {
-                    VehicleListView(searchRequest: searchRequest)
+                if let reservationDraft {
+                    VehicleListView(draft: reservationDraft)
                 }
             }
         }

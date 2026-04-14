@@ -33,21 +33,23 @@ struct ReservationDetailView: View {
                     )
                 }
                 
-                ReservationVehicleCard(vehicle: viewModel.draft.vehicle)
+                if let vehicle = viewModel.selectedVehicle {
+                    ReservationVehicleCard(vehicle: vehicle)
+                }
                 
                 HStack(spacing: 14) {
                     ReservationLocationCard(
                         title: "Alış",
-                        location: viewModel.draft.searchRequest.pickUpLocation,
-                        date: viewModel.draft.searchRequest.pickUpDate,
-                        time: viewModel.draft.searchRequest.pickUpTime
+                        location: viewModel.draft.pickUpLocation?.name ?? "",
+                        date: viewModel.draft.pickUpDate,
+                        time: FormatterHelper.timeString.string(from: viewModel.draft.pickUpTime)
                     )
-                    
+
                     ReservationLocationCard(
                         title: "Dönüş",
-                        location: viewModel.draft.searchRequest.dropOffLocation ?? viewModel.draft.searchRequest.pickUpLocation,
-                        date: viewModel.draft.searchRequest.dropOffDate,
-                        time: viewModel.draft.searchRequest.dropOffTime
+                        location: viewModel.draft.dropOffLocation?.name ?? viewModel.draft.pickUpLocation?.name ?? "",
+                        date: viewModel.draft.dropOffDate,
+                        time: FormatterHelper.timeString.string(from: viewModel.draft.dropOffTime)
                     )
                 }
                 

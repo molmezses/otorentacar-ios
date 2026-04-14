@@ -39,6 +39,8 @@ final class HomeViewModel: ObservableObject {
     private let authService: AuthServiceProtocol = AuthAPIService()
 
     private let locationService: LocationServiceProtocol
+    
+    
 
 
     init(
@@ -131,6 +133,29 @@ final class HomeViewModel: ObservableObject {
             dropOffDateTime: FormatterHelper.apiDateTime.string(from: dropOffCombined),
             pickUpLocationPointId: pickUpLocation.id,
             dropOffLocationPointId: dropOffLocation.id
+        )
+    }
+    
+    func buildReservationDraft() -> ReservationDraft? {
+        guard let pickUpLocation = selectedPickUpLocation else {
+            return nil
+        }
+        
+        let finalDropOffLocation = dropOffDifferentLocation
+            ? selectedDropOffLocation
+            : selectedPickUpLocation
+        
+        guard let dropOffLocation = finalDropOffLocation else {
+            return nil
+        }
+        
+        return ReservationDraft(
+            pickUpLocation: pickUpLocation,
+            dropOffLocation: dropOffLocation,
+            pickUpDate: pickUpDate,
+            pickUpTime: pickUpTime,
+            dropOffDate: dropOffDate,
+            dropOffTime: dropOffTime
         )
     }
     
