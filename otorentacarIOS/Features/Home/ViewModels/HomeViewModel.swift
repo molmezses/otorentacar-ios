@@ -114,6 +114,26 @@ final class HomeViewModel: ObservableObject {
         )
     }
     
+    func buildPriceSearchRequest() -> PriceSearchRequest? {
+        guard let token = InMemoryTokenStore.shared.fetchToken(),
+              let pickUpLocation = selectedPickUpLocation,
+              let dropOffLocation = dropOffDifferentLocation ? selectedDropOffLocation : selectedPickUpLocation
+        else {
+            return nil
+        }
+        
+        let pickUpCombined = FormatterHelper.combine(date: pickUpDate, time: pickUpTime)
+        let dropOffCombined = FormatterHelper.combine(date: dropOffDate, time: dropOffTime)
+        
+        return PriceSearchRequest(
+            token: token,
+            pickUpDateTime: FormatterHelper.apiDateTime.string(from: pickUpCombined),
+            dropOffDateTime: FormatterHelper.apiDateTime.string(from: dropOffCombined),
+            pickUpLocationPointId: pickUpLocation.id,
+            dropOffLocationPointId: dropOffLocation.id
+        )
+    }
+    
     
     
 }

@@ -43,4 +43,27 @@ enum FormatterHelper {
         formatter.dateFormat = "HH:mm"
         return formatter
     }()
+    
+    static let apiDateTime: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        return formatter
+    }()
+
+    static func combine(date: Date, time: Date) -> Date {
+        let calendar = Calendar.current
+        
+        let dateParts = calendar.dateComponents([.year, .month, .day], from: date)
+        let timeParts = calendar.dateComponents([.hour, .minute], from: time)
+        
+        var result = DateComponents()
+        result.year = dateParts.year
+        result.month = dateParts.month
+        result.day = dateParts.day
+        result.hour = timeParts.hour
+        result.minute = timeParts.minute
+        
+        return calendar.date(from: result) ?? date
+    }
 }
