@@ -30,7 +30,8 @@ struct HomeView: View {
                     }
                     
                     SearchFormCard(viewModel: viewModel) {
-                        if let draft = viewModel.buildReservationDraft() {
+                        if viewModel.validateSearchForm(),
+                           let draft = viewModel.buildReservationDraft() {
                             reservationDraft = draft
                             navigateToVehicleList = true
                         }
@@ -78,6 +79,11 @@ struct HomeView: View {
                 if let reservationDraft {
                     VehicleListView(draft: reservationDraft)
                 }
+            }
+            .alert("Uyarı", isPresented: $viewModel.showSearchErrorAlert) {
+                Button("Tamam", role: .cancel) { }
+            } message: {
+                Text(viewModel.searchErrorMessage)
             }
         }
     }

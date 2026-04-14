@@ -33,6 +33,9 @@ final class HomeViewModel: ObservableObject {
         components.minute = 0
         return Calendar.current.date(from: components) ?? Date()
     }()
+    
+    @Published var showSearchErrorAlert: Bool = false
+    @Published var searchErrorMessage: String = ""
 
     private let vehicleService: VehicleServiceProtocol
     
@@ -65,6 +68,39 @@ final class HomeViewModel: ObservableObject {
             await loadLocations()
             await loadHomeData()
         }
+    }
+    
+    func validateSearchForm() -> Bool {
+        guard selectedPickUpLocation != nil else {
+            searchErrorMessage = "Lütfen alış lokasyonu seçin."
+            showSearchErrorAlert = true
+            return false
+        }
+
+        if dropOffDifferentLocation && selectedDropOffLocation == nil {
+            searchErrorMessage = "Lütfen iade lokasyonu seçin."
+            showSearchErrorAlert = true
+            return false
+        }
+
+        let pickUpCombined = FormatterHelper.combine(date: pickUpDate, time: pickUpTime)
+        let dropOffCombined = FormatterHelper.combine(date: dropOffDate, time: dropOffTime)
+
+        let minimumPickUpDate = Date().addingTimeInterval(60 * 60)
+
+        if pickUpCombined < minimumPickUpDate {
+            searchErrorMessage = "Alış tarihi en az 1 saat sonrası olmalıdır."
+            showSearchErrorAlert = true
+            return false
+        }
+
+        if dropOffCombined <= pickUpCombined {
+            searchErrorMessage = "İade tarihi, alış tarihinden sonra olmalıdır."
+            showSearchErrorAlert = true
+            return false
+        }
+
+        return true
     }
     
     
