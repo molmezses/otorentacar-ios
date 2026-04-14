@@ -52,6 +52,9 @@ struct ExtraServicesView: View {
         }
         .background(AppColors.background.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
+        .task {
+            viewModel.onAppear()
+        }
         .navigationDestination(isPresented: $navigateToReservationDetail) {
             ReservationDetailView(
                 draft: viewModel.buildDraftForReservationDetail()
@@ -141,22 +144,55 @@ struct ExtraServicesView: View {
         }
     }
 
+    @ViewBuilder
     private var contentSection: some View {
-        LazyVStack(spacing: 16) {
-            ForEach(viewModel.services) { item in
-                ExtraServiceCard(
-                    item: item,
-                    dayCount: dayCount,
-                    onToggle: {
-                        viewModel.updateToggle(for: item.id, isOn: !item.isSelected)
-                    },
-                    onIncrease: {
-                        viewModel.increaseQuantity(for: item.id)
-                    },
-                    onDecrease: {
-                        viewModel.decreaseQuantity(for: item.id)
+        if viewModel.isLoading {
+            VStack(spacing: 16) {
+                ProgressView()
+                Text("Ek hizmetler yükleniyor...")
+                    .foregroundColor(AppColors.textSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 50)
+        } else if let errorMessage = viewModel.errorMessage {
+            VStack(spacing: 16) {
+                Text("Bir hata oluştu")
+                    .font(.title3.bold())
+
+                Text(errorMessage)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(AppColors.textSecondary)
+
+                Button("Tekrar Dene") {
+                    Task {
+                        await viewModel.loadExtras()
                     }
-                )
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(AppColors.primary)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 50)
+        } else {
+            LazyVStack(spacing: 16) {
+                ForEach(viewModel.services) { item in
+                    ExtraServiceCard(
+                        item: item,
+                        dayCount: dayCount,
+                        onToggle: {
+                            viewModel.updateToggle(for: item.id, isOn: !item.isSelected)
+                        },
+                        onIncrease: {
+                            viewModel.increaseQuantity(for: item.id)
+                        },
+                        onDecrease: {
+                            viewModel.decreaseQuantity(for: item.id)
+                        }
+                    )
+                }
             }
         }
     }
