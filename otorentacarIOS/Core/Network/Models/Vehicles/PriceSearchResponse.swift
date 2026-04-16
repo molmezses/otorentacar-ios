@@ -85,7 +85,7 @@ struct VehicleModelClassDTO: Codable {
 }
 
 extension VehiclePriceDTO {
-    func toDomain() -> Vehicle {
+    func toDomain(rentalDayCount: Int) -> Vehicle {
         Vehicle(
             id: modelId,
             name: name,
@@ -96,10 +96,12 @@ extension VehiclePriceDTO {
             passengerCount: maxPassenger,
             baggageCount: maxBigBaggage ?? maxSmallBaggage ?? 0,
             dailyPrice: pricing.dailyPrice,
-            totalPrice: pricing.dailyPrice,
+            totalPrice: pricing.dailyPrice * Double(rentalDayCount),
             imageURL: nil,
             badge: vehicleModelClass?.name,
-            isFavorite: false
+            isFavorite: false,
+            currencyId: pricing.currency.id,
+            currencyCode: pricing.currency.code
         )
     }
 }

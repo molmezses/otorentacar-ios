@@ -53,7 +53,9 @@ final class VehicleListViewModel: ObservableObject {
             }
 
             let result = try await priceSearchService.searchPrices(request: request)
-            let mappedVehicles = result.map { $0.toDomain() }
+            let mappedVehicles = result.map { dto in
+                dto.toDomain(rentalDayCount: rentalDayCount)
+            }
             vehicles = sortVehicles(mappedVehicles, by: selectedSortOption)
         } catch {
             errorMessage = error.localizedDescription
@@ -77,8 +79,8 @@ final class VehicleListViewModel: ObservableObject {
             dropOffTime: draft.dropOffTime,
             selectedVehicle: vehicle,
             selectedVehicleModelId: vehicle.id,
-            currencyId: draft.currencyId,
-            currencyCode: draft.currencyCode,
+            currencyId: vehicle.currencyId,
+            currencyCode: vehicle.currencyCode,
             selectedExtras: draft.selectedExtras,
             customerInfo: draft.customerInfo
         )
@@ -115,6 +117,14 @@ final class VehicleListViewModel: ObservableObject {
         case .nameAscending:
             return vehicles.sorted { "\($0.brand) \($0.name)" < "\($1.brand) \($1.name)" }
         }
+    }
+    
+    private var rentalDayCount: Int {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: draft.pickUpDate)
+        let end = calendar.startOfDay(for: draft.dropOffDate)
+        let days = calendar.dateComponents([.day], from: start, to: end).day ?? 1
+        return max(days, 1)
     }
 }
 

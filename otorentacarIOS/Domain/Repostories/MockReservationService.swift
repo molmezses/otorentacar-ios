@@ -30,7 +30,9 @@ final class MockReservationService: ReservationServiceProtocol {
             totalPrice: 4200,
             imageURL: nil,
             badge: "EKONOMİ",
-            isFavorite: false
+            isFavorite: false,
+            currencyId: 4,
+            currencyCode: "EUR"
         )
         
         return Reservation(

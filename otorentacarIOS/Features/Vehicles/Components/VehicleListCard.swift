@@ -69,15 +69,20 @@ struct VehicleListCard: View {
             .foregroundColor(AppColors.textSecondary)
             
             HStack(alignment: .bottom) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Toplam")
-                        .font(.system(size: 14))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Günlük")
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                     
-                    Text(FormatterHelper.currency.string(from: NSNumber(value: vehicle.totalPrice)) ?? "₺0")
-                        .font(.system(size: 28, weight: .bold))
+                    Text(FormatterHelper.currencyString(vehicle.dailyPrice, code: vehicle.currencyCode))
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.primary)
+                    
+                    Text("Toplam \(FormatterHelper.currencyString(vehicle.totalPrice, code: vehicle.currencyCode))")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppColors.textSecondary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Spacer()
                 

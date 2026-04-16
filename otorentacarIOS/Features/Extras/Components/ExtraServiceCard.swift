@@ -14,6 +14,7 @@ struct ExtraServiceCard: View {
     let onToggle: () -> Void
     let onIncrease: () -> Void
     let onDecrease: () -> Void
+    let currencyCode: String?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -54,8 +55,7 @@ struct ExtraServiceCard: View {
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                     
-                    Text(FormatterHelper.currency.string(from: NSNumber(value: item.pricePerDay)) ?? "₺0")
-                        .font(.system(size: 20, weight: .bold))
+                    Text(FormatterHelper.currencyString(item.pricePerDay, code: currencyCode))                       .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.primary)
                 }
                 
@@ -63,15 +63,21 @@ struct ExtraServiceCard: View {
                 
                 if item.type == .quantity {
                     HStack(spacing: 12) {
-                        quantityButton(icon: "minus", action: onDecrease)
+                        if item.quantity > 0 {
+                            quantityButton(icon: "minus", action: onDecrease)
+                        }
                         
                         Text("\(item.quantity)")
                             .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(AppColors.textPrimary)
+                            .monospacedDigit()
                             .frame(minWidth: 24)
                         
-                        quantityButton(icon: "plus", action: onIncrease)
+                        if item.quantity < item.maxCount {
+                            quantityButton(icon: "plus", action: onIncrease)
+                        }
                     }
-                } else {
+                }  else {
                     Text("\(dayCount) gün")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)

@@ -66,4 +66,15 @@ enum FormatterHelper {
         
         return calendar.date(from: result) ?? date
     }
+    
+    static func currencyString(_ value: Double, code: String?) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 0
+        formatter.currencyCode = code ?? "EUR"
+        formatter.locale = Locale(identifier: "en_IE")
+        
+        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
 }

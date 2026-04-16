@@ -74,6 +74,12 @@ final class ExtraServicesViewModel: ObservableObject {
 
     func increaseQuantity(for serviceId: Int) {
         guard let index = services.firstIndex(where: { $0.id == serviceId }) else { return }
+        
+        let current = services[index].quantity
+        let maxCount = services[index].maxCount
+        
+        guard current < maxCount else { return }
+        
         services[index].quantity += 1
         services[index].isSelected = true
     }

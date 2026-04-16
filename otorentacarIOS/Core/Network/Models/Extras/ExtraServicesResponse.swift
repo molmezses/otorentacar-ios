@@ -53,6 +53,7 @@ extension ExtraServiceDTO {
             title: name,
             description: description,
             pricePerDay: price,
+            maxCount: maxCount,
             isSelected: false,
             quantity: 0,
             type: maxCount > 1 ? .quantity : .toggle

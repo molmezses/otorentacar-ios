@@ -42,7 +42,8 @@ struct ExtraServicesView: View {
                 },
                 grandTotal: (viewModel.vehicle?.totalPrice ?? 0) + viewModel.selectedExtras.reduce(0) { partial, item in
                     partial + (item.pricePerDay * Double(max(item.quantity, 1)) * Double(dayCount))
-                }
+                },
+                currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode
             ) {
                 navigateToReservationDetail = true
             }
@@ -190,7 +191,8 @@ struct ExtraServicesView: View {
                         },
                         onDecrease: {
                             viewModel.decreaseQuantity(for: item.id)
-                        }
+                        },
+                        currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode
                     )
                 }
             }
