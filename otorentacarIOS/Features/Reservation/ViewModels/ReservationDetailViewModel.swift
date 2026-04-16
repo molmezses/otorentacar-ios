@@ -11,7 +11,8 @@ import Combine
 
 @MainActor
 final class ReservationDetailViewModel: ObservableObject {
-    @Published var fullName: String
+    @Published var name: String
+    @Published var surname: String
     @Published var phone: String
     @Published var birthDate: Date
     @Published var email: String
@@ -27,7 +28,8 @@ final class ReservationDetailViewModel: ObservableObject {
     init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
         self.draft = draft
         self.mode = mode
-        self.fullName = draft.customerInfo.fullName
+        self.name = draft.customerInfo.name
+        self.surname = draft.customerInfo.surname
         self.phone = draft.customerInfo.phone
         self.birthDate = draft.customerInfo.birthDate
         self.email = draft.customerInfo.email
@@ -74,7 +76,8 @@ final class ReservationDetailViewModel: ObservableObject {
     }
 
     var isFormValid: Bool {
-        !fullName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !surname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !phone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         email.contains("@")
@@ -150,7 +153,8 @@ final class ReservationDetailViewModel: ObservableObject {
             currencyCode: draft.currencyCode,
             selectedExtras: draft.selectedExtras,
             customerInfo: CustomerInfo(
-                fullName: fullName,
+                name: name,
+                surname: surname,
                 phone: phone,
                 birthDate: birthDate,
                 email: email,
@@ -163,7 +167,7 @@ final class ReservationDetailViewModel: ObservableObject {
         guard !isReadOnly else { return }
 
         guard isFormValid else {
-            errorMessage = "Lütfen gerekli alanları doğru şekilde doldurun."
+            errorMessage = "Lütfen ad, soyad, telefon, doğum tarihi ve e-posta alanlarını doğru doldurun."
             return
         }
 
