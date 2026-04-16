@@ -123,7 +123,7 @@ final class VehicleListViewModel: ObservableObject {
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: draft.pickUpDate)
         let end = calendar.startOfDay(for: draft.dropOffDate)
-        let days = calendar.dateComponents([.day], from: start, to: end).day ?? 1
+        let days = (calendar.dateComponents([.day], from: start, to: end).day ?? 0) + 1
         return max(days, 1)
     }
 }

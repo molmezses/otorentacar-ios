@@ -21,6 +21,8 @@ final class ReservationDetailViewModel: ObservableObject {
     @Published var isSubmitting: Bool = false
     @Published var errorMessage: String?
     @Published var showSuccessMessage: Bool = false
+    
+    private let reservationService: AddReservationServiceProtocol = AddReservationAPIService()
 
     let draft: ReservationDraft
     let mode: ReservationDetailMode
@@ -48,7 +50,7 @@ final class ReservationDetailViewModel: ObservableObject {
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: draft.pickUpDate)
         let end = calendar.startOfDay(for: draft.dropOffDate)
-        let days = calendar.dateComponents([.day], from: start, to: end).day ?? 1
+        let days = (calendar.dateComponents([.day], from: start, to: end).day ?? 0) + 1
         return max(days, 1)
     }
 
@@ -67,12 +69,10 @@ final class ReservationDetailViewModel: ObservableObject {
         vehicleRentalTotal + extrasTotal
     }
 
-    var taxAmount: Double {
-        subtotal * 0.20
-    }
+    
 
     var grandTotal: Double {
-        subtotal + taxAmount
+        subtotal
     }
 
     var isFormValid: Bool {
@@ -174,9 +174,17 @@ final class ReservationDetailViewModel: ObservableObject {
         isSubmitting = true
         errorMessage = nil
 
-        try? await Task.sleep(nanoseconds: 900_000_000)
+        do {
+            let updatedDraft = buildUpdatedDraft()
+            let reservationCode = try await reservationService.addReservation(draft: updatedDraft)
 
-        isSubmitting = false
-        showSuccessMessage = true
+            print("REZERVASYON KODU:", reservationCode)
+
+            isSubmitting = false
+            showSuccessMessage = true
+        } catch {
+            isSubmitting = false
+            errorMessage = error.localizedDescription
+        }
     }
 }

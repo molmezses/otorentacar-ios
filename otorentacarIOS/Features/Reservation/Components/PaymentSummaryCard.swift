@@ -11,7 +11,6 @@ import SwiftUI
 struct PaymentSummaryCard: View {
     let vehicleRentalTotal: Double
     let extrasTotal: Double
-    let taxAmount: Double
     let grandTotal: Double
     
     var body: some View {
@@ -31,7 +30,6 @@ struct PaymentSummaryCard: View {
                 summaryRow(title: "Ek Hizmetler", value: extrasTotal)
             }
             
-            summaryRow(title: "KDV (%20)", value: taxAmount)
             
             Divider()
             

@@ -12,6 +12,8 @@ struct ReservationDetailView: View {
     @StateObject private var viewModel: ReservationDetailViewModel
     @Environment(\.dismiss) private var dismiss
     
+    private let reservationService: AddReservationServiceProtocol = AddReservationAPIService()
+    
     init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
         _viewModel = StateObject(
             wrappedValue: ReservationDetailViewModel(draft: draft, mode: mode)
@@ -58,7 +60,6 @@ struct ReservationDetailView: View {
                 PaymentSummaryCard(
                     vehicleRentalTotal: viewModel.vehicleRentalTotal,
                     extrasTotal: viewModel.extrasTotal,
-                    taxAmount: viewModel.taxAmount,
                     grandTotal: viewModel.grandTotal
                 )
                 
