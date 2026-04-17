@@ -12,6 +12,7 @@ struct PaymentSummaryCard: View {
     let vehicleRentalTotal: Double
     let extrasTotal: Double
     let grandTotal: Double
+    let currencyCode: String?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -30,7 +31,6 @@ struct PaymentSummaryCard: View {
                 summaryRow(title: "Ek Hizmetler", value: extrasTotal)
             }
             
-            
             Divider()
             
             VStack(alignment: .leading, spacing: 8) {
@@ -38,7 +38,7 @@ struct PaymentSummaryCard: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(AppColors.primary)
                 
-                Text(FormatterHelper.fullCurrency.string(from: NSNumber(value: grandTotal)) ?? "₺0,00")
+                Text(FormatterHelper.currencyString(grandTotal, code: currencyCode))
                     .font(.system(size: 30, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
             }
@@ -57,7 +57,7 @@ struct PaymentSummaryCard: View {
             
             Spacer()
             
-            Text(FormatterHelper.fullCurrency.string(from: NSNumber(value: value)) ?? "₺0,00")
+            Text(FormatterHelper.currencyString(value, code: currencyCode))
                 .font(.system(size: 17, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
         }

@@ -12,7 +12,6 @@ struct ReservationDetailView: View {
     @StateObject private var viewModel: ReservationDetailViewModel
     @Environment(\.dismiss) private var dismiss
     
-    private let reservationService: AddReservationServiceProtocol = AddReservationAPIService()
     
     init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
         _viewModel = StateObject(
@@ -60,7 +59,8 @@ struct ReservationDetailView: View {
                 PaymentSummaryCard(
                     vehicleRentalTotal: viewModel.vehicleRentalTotal,
                     extrasTotal: viewModel.extrasTotal,
-                    grandTotal: viewModel.grandTotal
+                    grandTotal: viewModel.grandTotal,
+                    currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode
                 )
                 
                 if let errorMessage = viewModel.errorMessage, !viewModel.isReadOnly {
@@ -89,10 +89,8 @@ struct ReservationDetailView: View {
         }
         .background(AppColors.background.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
-        .alert("Başarılı", isPresented: $viewModel.showSuccessMessage) {
-            Button("Tamam") { }
-        } message: {
-            Text("Rezervasyon başarıyla oluşturuldu.")
+        .navigationDestination(isPresented: $viewModel.navigateToSuccess) {
+            ReservationSuccessView(reservationCode: viewModel.reservationCode)
         }
     }
     

@@ -22,6 +22,9 @@ final class ReservationDetailViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var showSuccessMessage: Bool = false
     
+    @Published var reservationCode: String = ""
+    @Published var navigateToSuccess: Bool = false
+    
     private let reservationService: AddReservationServiceProtocol = AddReservationAPIService()
 
     let draft: ReservationDraft
@@ -177,12 +180,12 @@ final class ReservationDetailViewModel: ObservableObject {
 
         do {
             let updatedDraft = buildUpdatedDraft()
-            let reservationCode = try await reservationService.addReservation(draft: updatedDraft)
-
-            print("REZERVASYON KODU:", reservationCode)
+            let code = try await reservationService.addReservation(draft: updatedDraft)
+            print("REZERVASYON KODU:", code)
 
             isSubmitting = false
-            showSuccessMessage = true
+            reservationCode = code
+            navigateToSuccess = true
         } catch {
             isSubmitting = false
             errorMessage = error.localizedDescription

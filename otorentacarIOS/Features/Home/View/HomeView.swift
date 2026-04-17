@@ -75,6 +75,11 @@ struct HomeView: View {
             .task {
                 viewModel.onAppear()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .resetBookingFlow)) { _ in
+                viewModel.resetForm()
+                reservationDraft = nil
+                navigateToVehicleList = false
+            }
             .navigationDestination(isPresented: $navigateToVehicleList) {
                 if let reservationDraft {
                     VehicleListView(draft: reservationDraft)

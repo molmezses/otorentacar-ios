@@ -195,6 +195,29 @@ final class HomeViewModel: ObservableObject {
         )
     }
     
+    func resetForm() {
+        let now = Date()
+
+        pickUpDate = now
+        dropOffDate = Calendar.current.date(byAdding: .day, value: 3, to: now) ?? now
+
+        var components = DateComponents()
+        components.hour = 10
+        components.minute = 0
+
+        pickUpTime = Calendar.current.date(from: components) ?? now
+        dropOffTime = Calendar.current.date(from: components) ?? now
+
+        dropOffDifferentLocation = false
+
+        selectedPickUpLocation = availableLocations.first
+        selectedDropOffLocation = availableLocations.first
+
+        showSearchErrorAlert = false
+        searchErrorMessage = ""
+        errorMessage = nil
+    }
+    
     
     
 }
