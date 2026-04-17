@@ -25,6 +25,7 @@ struct ReservationDraft {
     var selectedExtras: [ExtraService]
     
     var customerInfo: CustomerInfo
+    var childrenAges: [String]
     
     init(
         pickUpLocation: LocationDTO? = nil,
@@ -38,7 +39,8 @@ struct ReservationDraft {
         currencyId: Int? = nil,
         currencyCode: String? = nil,
         selectedExtras: [ExtraService] = [],
-        customerInfo: CustomerInfo = CustomerInfo()
+        customerInfo: CustomerInfo = CustomerInfo(),
+        childrenAges: [String] = []
     ) {
         self.pickUpLocation = pickUpLocation
         self.dropOffLocation = dropOffLocation
@@ -52,5 +54,6 @@ struct ReservationDraft {
         self.currencyCode = currencyCode
         self.selectedExtras = selectedExtras
         self.customerInfo = customerInfo
+        self.childrenAges = childrenAges
     }
 }

@@ -82,7 +82,8 @@ final class VehicleListViewModel: ObservableObject {
             currencyId: vehicle.currencyId,
             currencyCode: vehicle.currencyCode,
             selectedExtras: draft.selectedExtras,
-            customerInfo: draft.customerInfo
+            customerInfo: draft.customerInfo,
+            childrenAges: draft.childrenAges,
         )
     }
 
@@ -120,11 +121,12 @@ final class VehicleListViewModel: ObservableObject {
     }
     
     private var rentalDayCount: Int {
-        let calendar = Calendar.current
-        let start = calendar.startOfDay(for: draft.pickUpDate)
-        let end = calendar.startOfDay(for: draft.dropOffDate)
-        let days = (calendar.dateComponents([.day], from: start, to: end).day ?? 0) + 1
-        return max(days, 1)
+        FormatterHelper.rentalDayCount(
+            pickUpDate: draft.pickUpDate,
+            pickUpTime: draft.pickUpTime,
+            dropOffDate: draft.dropOffDate,
+            dropOffTime: draft.dropOffTime
+        )
     }
 }
 

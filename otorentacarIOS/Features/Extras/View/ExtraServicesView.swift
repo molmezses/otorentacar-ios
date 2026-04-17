@@ -45,7 +45,11 @@ struct ExtraServicesView: View {
                 },
                 currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode
             ) {
-                navigateToReservationDetail = true
+                if viewModel.areChildrenAgesValid {
+                    navigateToReservationDetail = true
+                } else {
+                    viewModel.errorMessage = "Lütfen tüm bebek koltuğu yaş bilgilerini girin."
+                }
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
@@ -64,11 +68,12 @@ struct ExtraServicesView: View {
     }
 
     private var dayCount: Int {
-        let calendar = Calendar.current
-        let start = calendar.startOfDay(for: viewModel.draft.pickUpDate)
-        let end = calendar.startOfDay(for: viewModel.draft.dropOffDate)
-        let days = (calendar.dateComponents([.day], from: start, to: end).day ?? 0) + 1
-        return max(days, 1)
+        FormatterHelper.rentalDayCount(
+            pickUpDate: viewModel.draft.pickUpDate,
+            pickUpTime: viewModel.draft.pickUpTime,
+            dropOffDate: viewModel.draft.dropOffDate,
+            dropOffTime: viewModel.draft.dropOffTime
+        )
     }
 
     private var topBar: some View {
@@ -192,8 +197,44 @@ struct ExtraServicesView: View {
                         onDecrease: {
                             viewModel.decreaseQuantity(for: item.id)
                         },
-                        currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode
+                        currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode,
+                        childrenAges: item.title.lowercased().contains("bebek koltuğu") ? viewModel.childrenAges : [],
+                        onChildAgeChange: item.title.lowercased().contains("bebek koltuğu")
+                            ? { index, value in
+                                viewModel.updateChildAge(value, at: index)
+                            }
+                            : nil
                     )
+                }
+            }
+        }
+    }
+    
+    private var childrenAgesSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Bebek Koltuğu Yaş Bilgileri")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(AppColors.textPrimary)
+
+            Text("Seçilen her bebek koltuğu için yaş bilgisi girin.")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(AppColors.textSecondary)
+
+            ForEach(Array(viewModel.childrenAges.enumerated()), id: \.offset) { index, value in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("\(index + 1). Bebek Koltuğu Yaşı")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(AppColors.textSecondary)
+
+                    TextField("Örn: 2", text: Binding(
+                        get: { value },
+                        set: { viewModel.updateChildAge($0, at: index) }
+                    ))
+                    .keyboardType(.numberPad)
+                    .padding()
+                    .frame(height: 58)
+                    .background(AppColors.inputBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
             }
         }

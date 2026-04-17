@@ -34,9 +34,30 @@ final class AddReservationAPIService: AddReservationServiceProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpBody = FormURLEncoder.encode(params)
         
-        let (data, _) = try await URLSession.shared.data(for: request)
+        if let body = buildReservationBody(from: params),
+           let bodyString = String(data: body, encoding: .utf8) {
+            print("ADD RESERVATION BODY:")
+            print(bodyString)
+        }
+
+        request.httpBody = buildReservationBody(from: params)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let httpResponse = response as? HTTPURLResponse {
+            print("ADD RESERVATION STATUS CODE:", httpResponse.statusCode)
+        }
+
+        if let rawResponse = String(data: data, encoding: .utf8) {
+            print("ADD RESERVATION RAW RESPONSE:")
+            print(rawResponse)
+        }
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200..<300 ~= httpResponse.statusCode else {
+            throw URLError(.badServerResponse)
+        }
         
         let decoded = try JSONDecoder().decode(AddReservationResponse.self, from: data)
         
@@ -47,5 +68,27 @@ final class AddReservationAPIService: AddReservationServiceProtocol {
         }
         
         return decoded.data?.reservationCode ?? "-"
+    }
+    
+    private func buildReservationBody(from parameters: [String: String]) -> Data? {
+        let bodyString = parameters
+            .map { key, value in
+                let encodedValue = escapeFormValue(value)
+                return "\(key)=\(encodedValue)"
+            }
+            .joined(separator: "&")
+        
+        return bodyString.data(using: .utf8)
+    }
+
+    private func escapeFormValue(_ string: String) -> String {
+        let generalDelimitersToEncode = ":#[]@"
+        let subDelimitersToEncode = "!$&'()*+,;="
+        
+        let allowedCharacterSet = CharacterSet.urlQueryAllowed.subtracting(
+            CharacterSet(charactersIn: "\(generalDelimitersToEncode)\(subDelimitersToEncode)")
+        )
+        
+        return string.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) ?? string
     }
 }

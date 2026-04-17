@@ -9,48 +9,54 @@
 import Foundation
 
 struct AddReservationRequestBuilder {
-    
     static func build(from draft: ReservationDraft) -> [String: String] {
-        
         var params: [String: String] = [:]
-        
-        // MARK: - Location & Vehicle
+
         params["pickUpLocationPointId"] = "\(draft.pickUpLocation?.id ?? 0)"
         params["dropOffLocationPointId"] = "\(draft.dropOffLocation?.id ?? 0)"
         params["vehicleModelId"] = "\(draft.selectedVehicleModelId ?? 0)"
-        
-        // MARK: - Dates
         params["pickUpDateTime"] = formatDate(draft.pickUpDate, time: draft.pickUpTime)
         params["dropOffDateTime"] = formatDate(draft.dropOffDate, time: draft.dropOffTime)
-        
-        // MARK: - Customer
         params["name"] = draft.customerInfo.name
         params["surname"] = draft.customerInfo.surname
         params["phone1"] = draft.customerInfo.phone
         params["email"] = draft.customerInfo.email
-        
-        // MARK: - Birth Date
         params["birthDate"] = formatBirthDate(draft.customerInfo.birthDate)
-        
-        // MARK: - Flight (optional)
+
         if !draft.customerInfo.flightCode.isEmpty {
             params["flightNo"] = draft.customerInfo.flightCode
         }
-        
-        // MARK: - Price
-        params["totalPrice"] = "\(draft.selectedVehicle?.totalPrice ?? 0)"
+
+        let vehicleTotal = draft.selectedVehicle?.totalPrice ?? 0
+
+        let dayCount = FormatterHelper.rentalDayCount(
+            pickUpDate: draft.pickUpDate,
+            pickUpTime: draft.pickUpTime,
+            dropOffDate: draft.dropOffDate,
+            dropOffTime: draft.dropOffTime
+        )
+
+        let extrasTotal = draft.selectedExtras.reduce(0.0) { partial, extra in
+            let quantity = max(extra.quantity, 1)
+            return partial + (extra.pricePerDay * Double(quantity) * Double(dayCount))
+        }
+
+        params["totalPrice"] = "\(vehicleTotal + extrasTotal)"
         params["currencyId"] = "\(draft.currencyId ?? 0)"
-        
-        // MARK: - Payment (şimdilik sabit)
-        params["paymentMethodId"] = "3" // 3 = Nakit
-        
-        // MARK: - Extras
-        for extra in draft.selectedExtras {
-            let key = "extra[\(extra.id)]"
-            let value = "\(max(extra.quantity, 1))"
-            params[key] = value
+        params["paymentMethodId"] = "3"
+
+        for extra in draft.selectedExtras where extra.isSelected || extra.quantity > 0 {
+            let quantity = max(extra.quantity, 1)
+            params["extras[\(extra.id)]"] = "\(quantity)"
         }
         
+        for (index, age) in draft.childrenAges.enumerated() {
+            let trimmed = age.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                params["childrenAges[\(index + 1)]"] = trimmed
+            }
+        }
+
         return params
     }
 }

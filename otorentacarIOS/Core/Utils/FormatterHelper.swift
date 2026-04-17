@@ -8,6 +8,24 @@
 import Foundation
 
 enum FormatterHelper {
+    
+    static func rentalDayCount(
+        pickUpDate: Date,
+        pickUpTime: Date,
+        dropOffDate: Date,
+        dropOffTime: Date
+    ) -> Int {
+        let start = combine(date: pickUpDate, time: pickUpTime)
+        let end = combine(date: dropOffDate, time: dropOffTime)
+        
+        let interval = end.timeIntervalSince(start)
+        
+        guard interval > 0 else { return 1 }
+        
+        let days = Int(ceil(interval / (24 * 60 * 60)))
+        return max(days, 1)
+    }
+    
     static let currency: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
