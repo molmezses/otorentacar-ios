@@ -36,15 +36,45 @@ struct ReservationVehicleCard: View {
             Spacer()
             
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color.gray.opacity(0.12))
+                .fill(.white)
                 .frame(width: 150, height: 100)
-                .overlay(
-                    Image(systemName: "car.side.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100)
-                        .foregroundColor(.gray.opacity(0.75))
-                )
+                .overlay {
+                    if let imageURL = vehicle.imageURL,
+                       let url = URL(string: imageURL) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 8)
+
+                            case .failure:
+                                Image(systemName: "car.side.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100)
+                                    .foregroundColor(.gray.opacity(0.75))
+
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    } else {
+                        Image(systemName: "car.side.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100)
+                            .foregroundColor(.gray.opacity(0.75))
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 18))
         }
         .padding(18)
         .background(Color.white)

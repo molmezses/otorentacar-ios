@@ -13,8 +13,8 @@ final class HomeViewModel: ObservableObject {
     @Published var selectedPickUpLocation: LocationDTO?
     @Published var selectedDropOffLocation: LocationDTO?
     @Published var availableLocations: [LocationDTO] = []
-    @Published var pickUpDate: Date = Date()
-    @Published var dropOffDate: Date = Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date()
+    @Published var pickUpDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+    @Published var dropOffDate: Date = Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()
     @Published var pickUpTime: Date = {
         var components = DateComponents()
         components.hour = 10
@@ -37,8 +37,7 @@ final class HomeViewModel: ObservableObject {
     @Published var showSearchErrorAlert: Bool = false
     @Published var searchErrorMessage: String = ""
 
-    private let vehicleService: VehicleServiceProtocol
-    
+    private let priceSearchService: PriceSearchServiceProtocol
     private let authService: AuthServiceProtocol = AuthAPIService()
 
     private let locationService: LocationServiceProtocol
@@ -47,17 +46,17 @@ final class HomeViewModel: ObservableObject {
 
 
     init(
-        vehicleService: VehicleServiceProtocol,
+        priceSearchService: PriceSearchServiceProtocol,
         locationService: LocationServiceProtocol
     ) {
-        self.vehicleService = vehicleService
+        self.priceSearchService = priceSearchService
         self.locationService = locationService
     }
 
     
     convenience init() {
         self.init(
-            vehicleService: MockVehicleService(),
+            priceSearchService: PriceSearchAPIService(),
             locationService: LocationAPIService()
         )
     }
@@ -110,11 +109,24 @@ final class HomeViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            async let featured = vehicleService.fetchFeaturedVehicles()
-            async let segments = vehicleService.fetchVehicleSegments()
+            if let request = buildPriceSearchRequest() {
+                let result = try await priceSearchService.searchPrices(request: request)
+                let rentalDayCount = FormatterHelper.rentalDayCount(
+                    pickUpDate: pickUpDate,
+                    pickUpTime: pickUpTime,
+                    dropOffDate: dropOffDate,
+                    dropOffTime: dropOffTime
+                )
 
-            self.featuredVehicles = try await featured
-            self.segments = try await segments
+                self.featuredVehicles = result
+                    .map { $0.toDomain(rentalDayCount: rentalDayCount) }
+                    .prefix(6)
+                    .map { $0 }
+            } else {
+                self.featuredVehicles = []
+            }
+
+            self.segments = []
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -198,8 +210,8 @@ final class HomeViewModel: ObservableObject {
     func resetForm() {
         let now = Date()
 
-        pickUpDate = now
-        dropOffDate = Calendar.current.date(byAdding: .day, value: 3, to: now) ?? now
+        pickUpDate = Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now
+        dropOffDate = Calendar.current.date(byAdding: .day, value: 4, to: now) ?? now
 
         var components = DateComponents()
         components.hour = 10

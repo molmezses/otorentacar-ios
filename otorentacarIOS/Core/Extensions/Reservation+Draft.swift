@@ -9,7 +9,11 @@ import Foundation
 
 extension Reservation {
     func toDraft() -> ReservationDraft {
-        ReservationDraft(
+        let nameParts = fullName.split(separator: " ").map(String.init)
+        let firstName = nameParts.first ?? ""
+        let surname = nameParts.dropFirst().joined(separator: " ")
+
+        return ReservationDraft(
             pickUpLocation: nil,
             dropOffLocation: nil,
             pickUpDate: pickUpDate,
@@ -18,10 +22,17 @@ extension Reservation {
             dropOffTime: dropOffDate,
             selectedVehicle: vehicle,
             selectedVehicleModelId: vehicle.id,
-            currencyId: nil,
-            currencyCode: nil,
+            currencyId: vehicle.currencyId,
+            currencyCode: vehicle.currencyCode,
             selectedExtras: [],
-            customerInfo: CustomerInfo()
+            customerInfo: CustomerInfo(
+                name: firstName,
+                surname: surname,
+                phone: phone,
+                birthDate: birthDate ?? Date(),
+                email: email,
+                flightCode: ""
+            ), childrenAges: []
         )
     }
 }

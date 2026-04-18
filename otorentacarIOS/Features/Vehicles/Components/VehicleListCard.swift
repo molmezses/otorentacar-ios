@@ -49,15 +49,45 @@ struct VehicleListCard: View {
             }
             
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color.gray.opacity(0.12))
+                .fill(.white)
                 .frame(height: 180)
-                .overlay(
-                    Image(systemName: "car.side.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 170)
-                        .foregroundColor(.gray.opacity(0.75))
-                )
+                .overlay {
+                    if let imageURL = vehicle.imageURL,
+                       let url = URL(string: imageURL) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 10)
+
+                            case .failure:
+                                Image(systemName: "car.side.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 170)
+                                    .foregroundColor(.gray.opacity(0.75))
+
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    } else {
+                        Image(systemName: "car.side.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 170)
+                            .foregroundColor(.gray.opacity(0.75))
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 18))
             
             HStack(spacing: 20) {
                 vehicleInfoItem(icon: "gearshape.fill", value: vehicle.transmission)

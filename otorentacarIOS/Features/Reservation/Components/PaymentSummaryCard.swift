@@ -42,6 +42,8 @@ struct PaymentSummaryCard: View {
                     .font(.system(size: 30, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
             }
+            
+            
         }
         .padding(20)
         .background(Color.white)

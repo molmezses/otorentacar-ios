@@ -20,11 +20,18 @@ final class SessionManager: ObservableObject {
     
     
     init(
-        authService: AuthServiceProtocol = AuthAPIService(),
-        tokenStore: TokenStoreProtocol = InMemoryTokenStore.shared
+        authService: AuthServiceProtocol,
+        tokenStore: TokenStoreProtocol
     ) {
         self.authService = authService
         self.tokenStore = tokenStore
+    }
+
+    convenience init() {
+        self.init(
+            authService: AuthAPIService(),
+            tokenStore: InMemoryTokenStore.shared
+        )
     }
     
     func prepareSession() async {

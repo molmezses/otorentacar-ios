@@ -39,6 +39,7 @@ struct VehiclePriceDTO: Codable {
     let pricing: VehiclePricingDTO
     let vehicleModelClass: VehicleModelClassDTO?
     let orderNo: Int?
+    let imageList: [String]?
 }
 
 struct VehicleBrandDTO: Codable {
@@ -97,7 +98,7 @@ extension VehiclePriceDTO {
             baggageCount: maxBigBaggage ?? maxSmallBaggage ?? 0,
             dailyPrice: pricing.dailyPrice,
             totalPrice: pricing.dailyPrice * Double(rentalDayCount),
-            imageURL: nil,
+            imageURL: imageList?.first.map { "\(AppConfig.baseURL)/\($0)" },
             badge: vehicleModelClass?.name,
             isFavorite: false,
             currencyId: pricing.currency.id,

@@ -63,6 +63,13 @@ struct ReservationDetailView: View {
                     currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode
                 )
                 
+                if !viewModel.selectedExtras.isEmpty {
+                    ReservationExtrasCard(
+                        extras: viewModel.selectedExtras,
+                        currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode
+                    )
+                }
+                
                 if let errorMessage = viewModel.errorMessage, !viewModel.isReadOnly {
                     Text(errorMessage)
                         .font(.system(size: 15, weight: .medium))

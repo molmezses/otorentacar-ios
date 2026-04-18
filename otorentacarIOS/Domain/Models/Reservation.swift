@@ -17,4 +17,12 @@ struct Reservation: Identifiable, Codable, Hashable {
     let dropOffDate: Date
     let totalAmount: Double
     let status: String
+    let extras: [SearchReservationExtraItemDTO]
+
+    let fullName: String
+    let email: String
+    let phone: String
+    let birthDate: Date?
+    let pickUpLocationPointId: Int?
+    let dropOffLocationPointId: Int?
 }

@@ -9,6 +9,12 @@ import SwiftUI
 
 struct FeaturedVehicleCard: View {
     let vehicle: Vehicle
+    @State private var isFavorite: Bool
+        
+        init(vehicle: Vehicle) {
+            self.vehicle = vehicle
+            _isFavorite = State(initialValue: vehicle.isFavorite)
+        }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -25,27 +31,59 @@ struct FeaturedVehicleCard: View {
                 
                 Spacer()
                 
-                Button {} label: {
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(AppColors.inputBackground)
-                        .frame(width: 48, height: 48)
-                        .overlay(
-                            Image(systemName: vehicle.isFavorite ? "heart.fill" : "heart")
-                                .foregroundColor(AppColors.primary)
-                        )
-                }
+                Button {
+                                    isFavorite.toggle()
+                                } label: {
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(AppColors.inputBackground)
+                                        .frame(width: 48, height: 48)
+                                        .overlay(
+                                            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                                .foregroundColor(AppColors.primary)
+                                        )
+                                }
             }
             
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.gray.opacity(0.15))
+                .fill(.white)
                 .frame(height: 170)
-                .overlay(
-                    Image(systemName: "car.side.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 140)
-                        .foregroundColor(.gray.opacity(0.7))
-                )
+                .overlay {
+                    if let imageURL = vehicle.imageURL,
+                       let url = URL(string: imageURL) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 10)
+
+                            case .failure:
+                                Image(systemName: "car.side.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 140)
+                                    .foregroundColor(.gray.opacity(0.7))
+
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    } else {
+                        Image(systemName: "car.side.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 140)
+                            .foregroundColor(.gray.opacity(0.7))
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 16))
             
             HStack(alignment: .bottom) {
                 HStack(spacing: 6) {
@@ -60,7 +98,7 @@ struct FeaturedVehicleCard: View {
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                     
-                    Text(FormatterHelper.currency.string(from: NSNumber(value: vehicle.dailyPrice)) ?? "₺0")
+                    Text(FormatterHelper.currencyString(vehicle.dailyPrice, code: vehicle.currencyCode))
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.primary)
                         .lineLimit(1)

@@ -46,7 +46,26 @@ final class ReservationDetailViewModel: ObservableObject {
     }
 
     var selectedExtras: [ExtraService] {
-        draft.selectedExtras.filter { $0.isSelected || $0.quantity > 0 }
+        switch mode {
+        case .create:
+            return draft.selectedExtras.filter { $0.isSelected || $0.quantity > 0 }
+
+        case .view(let reservation):
+            return reservation.extras.compactMap { item in
+                guard let extra = item.extra else { return nil }
+
+                return ExtraService(
+                    id: extra.id ?? 0,
+                    title: extra.name ?? "",
+                    description: extra.description,
+                    pricePerDay: extra.price ?? 0,
+                    maxCount: item.count ?? 1,
+                    isSelected: true,
+                    quantity: item.count ?? 1,
+                    type: (item.count ?? 1) > 1 ? .quantity : .toggle
+                )
+            }
+        }
     }
 
     var rentalDayCount: Int {
@@ -59,13 +78,29 @@ final class ReservationDetailViewModel: ObservableObject {
     }
 
     var vehicleRentalTotal: Double {
-        selectedVehicle?.totalPrice ?? 0
+        switch mode {
+        case .create:
+            return selectedVehicle?.totalPrice ?? 0
+
+        case .view(let reservation):
+            return max(reservation.totalAmount - extrasTotal, 0)
+        }
     }
 
     var extrasTotal: Double {
-        selectedExtras.reduce(0) { partial, item in
-            let quantity = max(item.quantity, 1)
-            return partial + (item.pricePerDay * Double(quantity) * Double(rentalDayCount))
+        switch mode {
+        case .create:
+            return selectedExtras.reduce(0) { partial, item in
+                let quantity = max(item.quantity, 1)
+                return partial + (item.pricePerDay * Double(quantity) * Double(rentalDayCount))
+            }
+
+        case .view(let reservation):
+            return reservation.extras.reduce(0) { partial, item in
+                let price = item.extra?.price ?? 0
+                let count = item.count ?? 1
+                return partial + (price * Double(count))
+            }
         }
     }
 

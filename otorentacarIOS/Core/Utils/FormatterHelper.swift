@@ -95,4 +95,25 @@ enum FormatterHelper {
         
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
+    
+    static let apiDateTimeParser: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        return formatter
+    }()
+    
+    static let reservationDateTimeParser: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+
+    static let birthDateParser: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter
+    }()
 }

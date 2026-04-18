@@ -110,15 +110,46 @@ struct ExtraServicesView: View {
     private var vehicleHeader: some View {
         HStack(spacing: 16) {
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color.white)
+                .fill(.white)
                 .frame(width: 110, height: 88)
-                .overlay(
-                    Image(systemName: "car.side.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 72)
-                        .foregroundColor(.gray.opacity(0.75))
-                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay {
+                    if let imageURL = viewModel.vehicle?.imageURL,
+                       let url = URL(string: imageURL) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 8)
+
+                            case .failure:
+                                Image(systemName: "car.side.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 72)
+                                    .foregroundColor(.gray.opacity(0.75))
+
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    } else {
+                        Image(systemName: "car.side.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 72)
+                            .foregroundColor(.gray.opacity(0.75))
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 18))
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("\((viewModel.vehicle?.brand ?? "")) \((viewModel.vehicle?.name ?? ""))")

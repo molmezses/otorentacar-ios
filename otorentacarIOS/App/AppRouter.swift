@@ -14,9 +14,9 @@ enum AppTab: String, CaseIterable {
     
     var title: String {
         switch self {
-        case .home: return "HOME"
-        case .bookings: return "MY BOOKINGS"
-        case .contact: return "CONTACT"
+        case .home: return "Rezervasyon"
+        case .bookings: return "Rezervasyon Sorgula"
+        case .contact: return "Iletisim"
         }
     }
     

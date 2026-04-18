@@ -33,14 +33,28 @@ struct PersonalInfoFormSection: View {
                     .keyboardType(.phonePad)
 
                 fieldTitle("Doğum Tarihi")
-                DatePicker("", selection: $viewModel.birthDate, displayedComponents: .date)
-                    .labelsHidden()
+
+                if viewModel.isReadOnly {
+                    HStack {
+                        Text(FormatterHelper.shortDate.string(from: viewModel.birthDate))
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundColor(AppColors.textPrimary)
+
+                        Spacer()
+                    }
                     .padding()
                     .frame(height: 58)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(viewModel.isReadOnly ? Color.gray.opacity(0.12) : AppColors.inputBackground)
+                    .background(Color.gray.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .disabled(viewModel.isReadOnly)
+                } else {
+                    DatePicker("", selection: $viewModel.birthDate, displayedComponents: .date)
+                        .labelsHidden()
+                        .padding()
+                        .frame(height: 58)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppColors.inputBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
 
                 fieldTitle("E-Posta")
                 textField("mehmet@email.com", text: $viewModel.email)
