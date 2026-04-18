@@ -12,6 +12,7 @@ struct ExtraSummaryBar: View {
     let vehicleTotal: Double
     let extrasTotal: Double
     let grandTotal: Double
+    let currencyCode: String?
     let action: () -> Void
     
     var body: some View {
@@ -42,7 +43,7 @@ struct ExtraSummaryBar: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
             
-            Text(FormatterHelper.currency.string(from: NSNumber(value: value)) ?? "₺0")
+            Text(FormatterHelper.currencyString(value, code: currencyCode))
                 .font(.system(size: isHighlighted ? 20 : 16, weight: .bold))
                 .foregroundColor(isHighlighted ? AppColors.primary : AppColors.textPrimary)
         }

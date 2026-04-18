@@ -17,6 +17,9 @@ final class MockReservationService: ReservationServiceProtocol {
             throw APIError.invalidResponse
         }
         
+        let pickUpDate = Date()
+        let dropOffDate = Calendar.current.date(byAdding: .day, value: 3, to: pickUpDate) ?? pickUpDate
+        
         let vehicle = Vehicle(
             id: 11,
             name: "Golf",
@@ -30,20 +33,28 @@ final class MockReservationService: ReservationServiceProtocol {
             totalPrice: 4200,
             imageURL: nil,
             badge: "EKONOMİ",
-            isFavorite: false
+            isFavorite: false,
+            currencyId: 4,
+            currencyCode: "EUR"
         )
         
         return Reservation(
             id: 1,
             trackingCode: trimmedCode,
             vehicle: vehicle,
-            pickUpLocation: "Sabiha Gökçen Havalimanı",
-            dropOffLocation: "Sabiha Gökçen Havalimanı",
-            pickUpDate: Date(),
-            dropOffDate: Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date(),
-            totalAmount: 5580,
-            status: "Onaylandı"
+            pickUpLocation: "Kayseri Erkilet Havalimanı",
+            dropOffLocation: "Kayseri Erkilet Havalimanı",
+            pickUpDate: pickUpDate,
+            dropOffDate: dropOffDate,
+            totalAmount: 1200,
+            status: "Onaylandı",
+            extras: [],
+            fullName: "Test Kullanıcı",
+            email: "test@example.com",
+            phone: "05000000000",
+            birthDate: Calendar.current.date(byAdding: .year, value: -25, to: Date()),
+            pickUpLocationPointId: 1,
+            dropOffLocationPointId: 1
         )
     }
 }
-

@@ -11,41 +11,45 @@ import SwiftUI
 struct ExtraServicesView: View {
     @StateObject private var viewModel: ExtraServicesViewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var navigateToReservationDetail = false
-    
-    init(vehicle: Vehicle, searchRequest: ReservationSearchRequest) {
+
+    init(draft: ReservationDraft) {
         _viewModel = StateObject(
-            wrappedValue: ExtraServicesViewModel(
-                vehicle: vehicle,
-                searchRequest: searchRequest
-            )
+            wrappedValue: ExtraServicesViewModel(draft: draft)
         )
     }
-    
+
     var body: some View {
         VStack(spacing: 0) {
             topBar
-            
+
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
                     vehicleHeader
-                    
                     titleSection
-                    
                     contentSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
                 .padding(.bottom, 24)
             }
-            
+
             ExtraSummaryBar(
-                vehicleTotal: viewModel.vehicle.totalPrice,
-                extrasTotal: viewModel.extrasTotal,
-                grandTotal: viewModel.grandTotal
+                vehicleTotal: viewModel.vehicle?.totalPrice ?? 0,
+                extrasTotal: viewModel.selectedExtras.reduce(0) { partial, item in
+                    partial + (item.pricePerDay * Double(max(item.quantity, 1)) * Double(dayCount))
+                },
+                grandTotal: (viewModel.vehicle?.totalPrice ?? 0) + viewModel.selectedExtras.reduce(0) { partial, item in
+                    partial + (item.pricePerDay * Double(max(item.quantity, 1)) * Double(dayCount))
+                },
+                currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode
             ) {
-                navigateToReservationDetail = true
+                if viewModel.areChildrenAgesValid {
+                    navigateToReservationDetail = true
+                } else {
+                    viewModel.errorMessage = "Lütfen tüm bebek koltuğu yaş bilgilerini girin."
+                }
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
@@ -58,15 +62,20 @@ struct ExtraServicesView: View {
         }
         .navigationDestination(isPresented: $navigateToReservationDetail) {
             ReservationDetailView(
-                draft: ReservationDraft(
-                    vehicle: viewModel.vehicle,
-                    searchRequest: viewModel.searchRequest,
-                    extras: viewModel.selectedExtras
-                )
+                draft: viewModel.buildDraftForReservationDetail()
             )
         }
     }
-    
+
+    private var dayCount: Int {
+        FormatterHelper.rentalDayCount(
+            pickUpDate: viewModel.draft.pickUpDate,
+            pickUpTime: viewModel.draft.pickUpTime,
+            dropOffDate: viewModel.draft.dropOffDate,
+            dropOffTime: viewModel.draft.dropOffTime
+        )
+    }
+
     private var topBar: some View {
         HStack {
             Button {
@@ -81,15 +90,15 @@ struct ExtraServicesView: View {
                             .font(.system(size: 18, weight: .semibold))
                     )
             }
-            
+
             Spacer()
-            
+
             Text("Ek Hizmetler")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
-            
+
             Spacer()
-            
+
             RoundedRectangle(cornerRadius: 14)
                 .fill(Color.clear)
                 .frame(width: 46, height: 46)
@@ -97,50 +106,81 @@ struct ExtraServicesView: View {
         .padding(.horizontal, 20)
         .padding(.top, 16)
     }
-    
+
     private var vehicleHeader: some View {
         HStack(spacing: 16) {
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color.white)
+                .fill(.white)
                 .frame(width: 110, height: 88)
-                .overlay(
-                    Image(systemName: "car.side.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 72)
-                        .foregroundColor(.gray.opacity(0.75))
-                )
-            
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay {
+                    if let imageURL = viewModel.vehicle?.imageURL,
+                       let url = URL(string: imageURL) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 8)
+
+                            case .failure:
+                                Image(systemName: "car.side.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 72)
+                                    .foregroundColor(.gray.opacity(0.75))
+
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    } else {
+                        Image(systemName: "car.side.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 72)
+                            .foregroundColor(.gray.opacity(0.75))
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+
             VStack(alignment: .leading, spacing: 6) {
-                Text("\(viewModel.vehicle.brand) \(viewModel.vehicle.name)")
+                Text("\((viewModel.vehicle?.brand ?? "")) \((viewModel.vehicle?.name ?? ""))")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
-                
-                Text(viewModel.vehicle.segment)
+
+                Text(viewModel.vehicle?.segment ?? "")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
-                
-                Text("\(viewModel.dayCount) gün kiralama")
+
+                Text("\(dayCount) gün kiralama")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.primary)
             }
-            
+
             Spacer()
         }
     }
-    
+
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Yolculuğunu Güçlendir")
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
-            
+
             Text("İhtiyacına uygun ek hizmetleri seçebilirsin.")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }
     }
-    
+
     @ViewBuilder
     private var contentSection: some View {
         if viewModel.isLoading {
@@ -155,11 +195,11 @@ struct ExtraServicesView: View {
             VStack(spacing: 16) {
                 Text("Bir hata oluştu")
                     .font(.title3.bold())
-                
+
                 Text(errorMessage)
                     .multilineTextAlignment(.center)
                     .foregroundColor(AppColors.textSecondary)
-                
+
                 Button("Tekrar Dene") {
                     Task {
                         await viewModel.loadExtras()
@@ -175,20 +215,57 @@ struct ExtraServicesView: View {
             .padding(.top, 50)
         } else {
             LazyVStack(spacing: 16) {
-                ForEach(viewModel.extraServices) { item in
+                ForEach(viewModel.services) { item in
                     ExtraServiceCard(
                         item: item,
-                        dayCount: viewModel.dayCount,
+                        dayCount: dayCount,
                         onToggle: {
-                            viewModel.toggleSelection(for: item)
+                            viewModel.updateToggle(for: item.id, isOn: !item.isSelected)
                         },
                         onIncrease: {
-                            viewModel.increaseQuantity(for: item)
+                            viewModel.increaseQuantity(for: item.id)
                         },
                         onDecrease: {
-                            viewModel.decreaseQuantity(for: item)
-                        }
+                            viewModel.decreaseQuantity(for: item.id)
+                        },
+                        currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode,
+                        childrenAges: item.title.lowercased().contains("bebek koltuğu") ? viewModel.childrenAges : [],
+                        onChildAgeChange: item.title.lowercased().contains("bebek koltuğu")
+                            ? { index, value in
+                                viewModel.updateChildAge(value, at: index)
+                            }
+                            : nil
                     )
+                }
+            }
+        }
+    }
+    
+    private var childrenAgesSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Bebek Koltuğu Yaş Bilgileri")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(AppColors.textPrimary)
+
+            Text("Seçilen her bebek koltuğu için yaş bilgisi girin.")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(AppColors.textSecondary)
+
+            ForEach(Array(viewModel.childrenAges.enumerated()), id: \.offset) { index, value in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("\(index + 1). Bebek Koltuğu Yaşı")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(AppColors.textSecondary)
+
+                    TextField("Örn: 2", text: Binding(
+                        get: { value },
+                        set: { viewModel.updateChildAge($0, at: index) }
+                    ))
+                    .keyboardType(.numberPad)
+                    .padding()
+                    .frame(height: 58)
+                    .background(AppColors.inputBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
             }
         }

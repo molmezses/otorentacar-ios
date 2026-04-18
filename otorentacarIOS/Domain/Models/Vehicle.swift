@@ -21,4 +21,6 @@ struct Vehicle: Identifiable, Codable, Hashable {
     let imageURL: String?
     let badge: String?
     let isFavorite: Bool
+    let currencyId: Int?
+    let currencyCode: String?
 }

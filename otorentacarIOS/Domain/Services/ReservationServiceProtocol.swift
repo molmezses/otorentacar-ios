@@ -8,5 +8,5 @@
 import Foundation
 
 protocol ReservationServiceProtocol {
-    func fetchReservation(by trackingCode: String) async throws -> Reservation
+    func fetchReservation(by code: String) async throws -> Reservation
 }

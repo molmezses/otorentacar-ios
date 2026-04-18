@@ -12,6 +12,7 @@ struct ReservationDetailView: View {
     @StateObject private var viewModel: ReservationDetailViewModel
     @Environment(\.dismiss) private var dismiss
     
+    
     init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
         _viewModel = StateObject(
             wrappedValue: ReservationDetailViewModel(draft: draft, mode: mode)
@@ -33,21 +34,23 @@ struct ReservationDetailView: View {
                     )
                 }
                 
-                ReservationVehicleCard(vehicle: viewModel.draft.vehicle)
+                if let vehicle = viewModel.selectedVehicle {
+                    ReservationVehicleCard(vehicle: vehicle)
+                }
                 
                 HStack(spacing: 14) {
                     ReservationLocationCard(
                         title: "Alış",
-                        location: viewModel.draft.searchRequest.pickUpLocation,
-                        date: viewModel.draft.searchRequest.pickUpDate,
-                        time: viewModel.draft.searchRequest.pickUpTime
+                        location: viewModel.draft.pickUpLocation?.name ?? "",
+                        date: viewModel.draft.pickUpDate,
+                        time: FormatterHelper.timeString.string(from: viewModel.draft.pickUpTime)
                     )
-                    
+
                     ReservationLocationCard(
                         title: "Dönüş",
-                        location: viewModel.draft.searchRequest.dropOffLocation ?? viewModel.draft.searchRequest.pickUpLocation,
-                        date: viewModel.draft.searchRequest.dropOffDate,
-                        time: viewModel.draft.searchRequest.dropOffTime
+                        location: viewModel.draft.dropOffLocation?.name ?? viewModel.draft.pickUpLocation?.name ?? "",
+                        date: viewModel.draft.dropOffDate,
+                        time: FormatterHelper.timeString.string(from: viewModel.draft.dropOffTime)
                     )
                 }
                 
@@ -56,9 +59,16 @@ struct ReservationDetailView: View {
                 PaymentSummaryCard(
                     vehicleRentalTotal: viewModel.vehicleRentalTotal,
                     extrasTotal: viewModel.extrasTotal,
-                    taxAmount: viewModel.taxAmount,
-                    grandTotal: viewModel.grandTotal
+                    grandTotal: viewModel.grandTotal,
+                    currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode
                 )
+                
+                if !viewModel.selectedExtras.isEmpty {
+                    ReservationExtrasCard(
+                        extras: viewModel.selectedExtras,
+                        currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode
+                    )
+                }
                 
                 if let errorMessage = viewModel.errorMessage, !viewModel.isReadOnly {
                     Text(errorMessage)
@@ -86,10 +96,8 @@ struct ReservationDetailView: View {
         }
         .background(AppColors.background.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
-        .alert("Başarılı", isPresented: $viewModel.showSuccessMessage) {
-            Button("Tamam") { }
-        } message: {
-            Text("Rezervasyon başarıyla oluşturuldu.")
+        .navigationDestination(isPresented: $viewModel.navigateToSuccess) {
+            ReservationSuccessView(reservationCode: viewModel.reservationCode)
         }
     }
     

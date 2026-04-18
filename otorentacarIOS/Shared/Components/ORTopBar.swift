@@ -25,19 +25,7 @@ struct ORTopBar: View {
             
             Spacer()
             
-            Button(action: { profileTap?() }) {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.black.opacity(0.85))
-                    .frame(width: 46, height: 46)
-                    .overlay(
-                        Image(systemName: "person.fill")
-                            .foregroundColor(.white)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(AppColors.primary, lineWidth: 2)
-                    )
-            }
+            
         }
     }
 }

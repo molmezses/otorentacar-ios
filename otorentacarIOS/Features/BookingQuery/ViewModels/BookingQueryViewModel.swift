@@ -24,7 +24,7 @@ final class BookingQueryViewModel: ObservableObject {
     }
     
     convenience init() {
-        self.init(reservationService: MockReservationService())
+        self.init(reservationService: SearchReservationAPIService())
     }
     
     func queryReservation() {

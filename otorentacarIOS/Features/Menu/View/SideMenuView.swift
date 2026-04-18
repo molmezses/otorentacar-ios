@@ -13,7 +13,6 @@ struct SideMenuView: View {
         .init(title: "Rezervasyonlarım", icon: "car.fill", destination: .bookings),
         .init(title: "Hakkımızda", icon: "info.circle.fill", destination: .about),
         .init(title: "Hizmetlerimiz", icon: "cross.case.fill", destination: .services),
-        .init(title: "S.S.S", icon: "questionmark.square.fill", destination: .faq),
         .init(title: "İletişim", icon: "at", destination: .contact)
     ]
     
@@ -78,8 +77,7 @@ struct SideMenuView: View {
             
             VStack(alignment: .leading, spacing: 8) {
                 Text("Otorentacar")
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(AppColors.textPrimary)
+                    .font(.system(size: 24, weight: .bold))                    .foregroundColor(AppColors.textPrimary)
                 
                 Text("Hoş geldiniz")
                     .font(.system(size: 20, weight: .semibold))
@@ -94,19 +92,21 @@ struct SideMenuView: View {
     }
     
     private var logoView: some View {
-        RoundedRectangle(cornerRadius: 22)
-            .fill(AppColors.primarySoft)
-            .frame(width: 84, height: 84)
+        RoundedRectangle(cornerRadius: 10)
+            .fill(AppColors.primary)
+            .frame(width: 132, height: 38)
             .overlay(
-                Image(systemName: "car.side.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 42)
-                    .foregroundColor(AppColors.primary)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 22)
-                    .stroke(AppColors.primary.opacity(0.15), lineWidth: 1.5)
+                VStack(spacing: 3) {
+                    Text("Otorentacar")
+                        .font(.system(size: 13, weight: .heavy))
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color.yellow.opacity(0.9))
+                        .frame(width: 68, height: 2.5)
+                }
             )
     }
 }

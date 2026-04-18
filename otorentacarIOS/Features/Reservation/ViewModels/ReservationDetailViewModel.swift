@@ -11,78 +11,124 @@ import Combine
 
 @MainActor
 final class ReservationDetailViewModel: ObservableObject {
-    @Published var fullName: String
+    @Published var name: String
+    @Published var surname: String
     @Published var phone: String
     @Published var birthDate: Date
     @Published var email: String
     @Published var flightCode: String
-    
+
     @Published var isSubmitting: Bool = false
     @Published var errorMessage: String?
     @Published var showSuccessMessage: Bool = false
     
+    @Published var reservationCode: String = ""
+    @Published var navigateToSuccess: Bool = false
+    
+    private let reservationService: AddReservationServiceProtocol = AddReservationAPIService()
+
     let draft: ReservationDraft
     let mode: ReservationDetailMode
-    
+
     init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
         self.draft = draft
         self.mode = mode
-        self.fullName = draft.customerInfo.fullName
+        self.name = draft.customerInfo.name
+        self.surname = draft.customerInfo.surname
         self.phone = draft.customerInfo.phone
         self.birthDate = draft.customerInfo.birthDate
         self.email = draft.customerInfo.email
         self.flightCode = draft.customerInfo.flightCode
     }
-    
+
+    var selectedVehicle: Vehicle? {
+        draft.selectedVehicle
+    }
+
     var selectedExtras: [ExtraService] {
-        draft.extras.filter { $0.isSelected || $0.quantity > 0 }
-    }
-    
-    var rentalDayCount: Int {
-        let calendar = Calendar.current
-        let start = calendar.startOfDay(for: draft.searchRequest.pickUpDate)
-        let end = calendar.startOfDay(for: draft.searchRequest.dropOffDate)
-        let days = calendar.dateComponents([.day], from: start, to: end).day ?? 1
-        return max(days, 1)
-    }
-    
-    var vehicleRentalTotal: Double {
-        draft.vehicle.totalPrice
-    }
-    
-    var extrasTotal: Double {
-        selectedExtras.reduce(0) { partial, item in
-            let quantity = max(item.quantity, 1)
-            return partial + (item.pricePerDay * Double(quantity) * Double(rentalDayCount))
+        switch mode {
+        case .create:
+            return draft.selectedExtras.filter { $0.isSelected || $0.quantity > 0 }
+
+        case .view(let reservation):
+            return reservation.extras.compactMap { item in
+                guard let extra = item.extra else { return nil }
+
+                return ExtraService(
+                    id: extra.id ?? 0,
+                    title: extra.name ?? "",
+                    description: extra.description,
+                    pricePerDay: extra.price ?? 0,
+                    maxCount: item.count ?? 1,
+                    isSelected: true,
+                    quantity: item.count ?? 1,
+                    type: (item.count ?? 1) > 1 ? .quantity : .toggle
+                )
+            }
         }
     }
-    
+
+    var rentalDayCount: Int {
+        FormatterHelper.rentalDayCount(
+            pickUpDate: draft.pickUpDate,
+            pickUpTime: draft.pickUpTime,
+            dropOffDate: draft.dropOffDate,
+            dropOffTime: draft.dropOffTime
+        )
+    }
+
+    var vehicleRentalTotal: Double {
+        switch mode {
+        case .create:
+            return selectedVehicle?.totalPrice ?? 0
+
+        case .view(let reservation):
+            return max(reservation.totalAmount - extrasTotal, 0)
+        }
+    }
+
+    var extrasTotal: Double {
+        switch mode {
+        case .create:
+            return selectedExtras.reduce(0) { partial, item in
+                let quantity = max(item.quantity, 1)
+                return partial + (item.pricePerDay * Double(quantity) * Double(rentalDayCount))
+            }
+
+        case .view(let reservation):
+            return reservation.extras.reduce(0) { partial, item in
+                let price = item.extra?.price ?? 0
+                let count = item.count ?? 1
+                return partial + (price * Double(count))
+            }
+        }
+    }
+
     var subtotal: Double {
         vehicleRentalTotal + extrasTotal
     }
+
     
-    var taxAmount: Double {
-        subtotal * 0.20
-    }
-    
+
     var grandTotal: Double {
-        subtotal + taxAmount
+        subtotal
     }
-    
+
     var isFormValid: Bool {
-        !fullName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !surname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !phone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         email.contains("@")
     }
-    
+
     var isReadOnly: Bool {
         if case .view = mode {
             return true
         }
         return false
     }
-    
+
     var screenTitle: String {
         switch mode {
         case .create:
@@ -91,7 +137,7 @@ final class ReservationDetailViewModel: ObservableObject {
             return "Rezervasyon Bilgileri"
         }
     }
-    
+
     var heroTitle: String {
         switch mode {
         case .create:
@@ -100,7 +146,7 @@ final class ReservationDetailViewModel: ObservableObject {
             return "Rezervasyonun Hazır"
         }
     }
-    
+
     var heroSubtitle: String {
         switch mode {
         case .create:
@@ -109,11 +155,11 @@ final class ReservationDetailViewModel: ObservableObject {
             return "Mevcut rezervasyon bilgilerini aşağıda görüntüleyebilirsin."
         }
     }
-    
+
     var actionButtonTitle: String {
         isSubmitting ? "İşleniyor..." : "Rezervasyonu Tamamla"
     }
-    
+
     var reservationStatusText: String? {
         switch mode {
         case .create:
@@ -122,7 +168,7 @@ final class ReservationDetailViewModel: ObservableObject {
             return reservation.status
         }
     }
-    
+
     var trackingCodeText: String? {
         switch mode {
         case .create:
@@ -131,14 +177,23 @@ final class ReservationDetailViewModel: ObservableObject {
             return reservation.trackingCode
         }
     }
-    
+
     func buildUpdatedDraft() -> ReservationDraft {
         ReservationDraft(
-            vehicle: draft.vehicle,
-            searchRequest: draft.searchRequest,
-            extras: draft.extras,
+            pickUpLocation: draft.pickUpLocation,
+            dropOffLocation: draft.dropOffLocation,
+            pickUpDate: draft.pickUpDate,
+            pickUpTime: draft.pickUpTime,
+            dropOffDate: draft.dropOffDate,
+            dropOffTime: draft.dropOffTime,
+            selectedVehicle: draft.selectedVehicle,
+            selectedVehicleModelId: draft.selectedVehicleModelId,
+            currencyId: draft.currencyId,
+            currencyCode: draft.currencyCode,
+            selectedExtras: draft.selectedExtras,
             customerInfo: CustomerInfo(
-                fullName: fullName,
+                name: name,
+                surname: surname,
                 phone: phone,
                 birthDate: birthDate,
                 email: email,
@@ -146,21 +201,29 @@ final class ReservationDetailViewModel: ObservableObject {
             )
         )
     }
-    
+
     func submitReservation() async {
         guard !isReadOnly else { return }
-        
+
         guard isFormValid else {
-            errorMessage = "Lütfen gerekli alanları doğru şekilde doldurun."
+            errorMessage = "Lütfen ad, soyad, telefon, doğum tarihi ve e-posta alanlarını doğru doldurun."
             return
         }
-        
+
         isSubmitting = true
         errorMessage = nil
-        
-        try? await Task.sleep(nanoseconds: 900_000_000)
-        
-        isSubmitting = false
-        showSuccessMessage = true
+
+        do {
+            let updatedDraft = buildUpdatedDraft()
+            let code = try await reservationService.addReservation(draft: updatedDraft)
+            print("REZERVASYON KODU:", code)
+
+            isSubmitting = false
+            reservationCode = code
+            navigateToSuccess = true
+        } catch {
+            isSubmitting = false
+            errorMessage = error.localizedDescription
+        }
     }
 }

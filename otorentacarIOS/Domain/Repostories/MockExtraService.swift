@@ -16,6 +16,7 @@ final class MockExtraService: ExtraServiceProtocol {
                 title: "Mini Hasar Güvencesi",
                 description: "Küçük çaplı hasarlar için ek koruma.",
                 pricePerDay: 149,
+                maxCount: 1,
                 isSelected: true,
                 quantity: 1,
                 type: .toggle
@@ -25,6 +26,7 @@ final class MockExtraService: ExtraServiceProtocol {
                 title: "Tam Koruma Paketi",
                 description: "Daha kapsamlı güvence seçeneği.",
                 pricePerDay: 249,
+                maxCount: 1,
                 isSelected: false,
                 quantity: 1,
                 type: .single
@@ -34,6 +36,7 @@ final class MockExtraService: ExtraServiceProtocol {
                 title: "Ek Sürücü",
                 description: "Aracı ikinci bir sürücü de kullanabilsin.",
                 pricePerDay: 99,
+                maxCount: 1,
                 isSelected: false,
                 quantity: 1,
                 type: .toggle
@@ -43,6 +46,7 @@ final class MockExtraService: ExtraServiceProtocol {
                 title: "Bebek Koltuğu",
                 description: "Çocuklu aileler için güvenli koltuk.",
                 pricePerDay: 75,
+                maxCount: 1,
                 isSelected: false,
                 quantity: 0,
                 type: .quantity
@@ -52,6 +56,7 @@ final class MockExtraService: ExtraServiceProtocol {
                 title: "Navigasyon",
                 description: "Dahili veya taşınabilir navigasyon cihazı.",
                 pricePerDay: 60,
+                maxCount: 1,
                 isSelected: false,
                 quantity: 0,
                 type: .quantity

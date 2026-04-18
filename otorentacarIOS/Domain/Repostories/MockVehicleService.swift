@@ -40,7 +40,9 @@ final class MockVehicleService: VehicleServiceProtocol {
                 totalPrice: 3750,
                 imageURL: nil,
                 badge: "POPULAR",
-                isFavorite: true
+                isFavorite: true,
+                currencyId: 4,
+                currencyCode: "EUR"
             ),
             Vehicle(
                 id: 2,
@@ -55,7 +57,9 @@ final class MockVehicleService: VehicleServiceProtocol {
                 totalPrice: 5550,
                 imageURL: nil,
                 badge: "ECO HYBRID",
-                isFavorite: false
+                isFavorite: false,
+                currencyId: 4,
+                currencyCode: "EUR"
             ),
             Vehicle(
                 id: 3,
@@ -70,7 +74,9 @@ final class MockVehicleService: VehicleServiceProtocol {
                 totalPrice: 3450,
                 imageURL: nil,
                 badge: "FIRSAT",
-                isFavorite: false
+                isFavorite: false,
+                currencyId: 4,
+                currencyCode: "EUR"
             ),
             Vehicle(
                 id: 4,
@@ -85,7 +91,9 @@ final class MockVehicleService: VehicleServiceProtocol {
                 totalPrice: 7050,
                 imageURL: nil,
                 badge: "SUV",
-                isFavorite: true
+                isFavorite: true,
+                currencyId: 4,
+                currencyCode: "EUR"
             ),
             Vehicle(
                 id: 5,
@@ -100,7 +108,9 @@ final class MockVehicleService: VehicleServiceProtocol {
                 totalPrice: 8850,
                 imageURL: nil,
                 badge: "PREMIUM",
-                isFavorite: false
+                isFavorite: false,
+                currencyId: 4,
+                currencyCode: "EUR"
             )
         ]
     }

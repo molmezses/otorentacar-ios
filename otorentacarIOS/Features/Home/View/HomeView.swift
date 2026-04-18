@@ -10,8 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var navigateToVehicleList = false
-    @State private var searchRequest: ReservationSearchRequest?
-    
+    @State private var reservationDraft: ReservationDraft?
     var onMenuTap: () -> Void
     
     var body: some View {
@@ -31,16 +30,19 @@ struct HomeView: View {
                     }
                     
                     SearchFormCard(viewModel: viewModel) {
-                        let request = viewModel.buildSearchRequest()
-                        searchRequest = request
-                        navigateToVehicleList = true
+                        if viewModel.validateSearchForm(),
+                           let draft = viewModel.buildReservationDraft() {
+                            reservationDraft = draft
+                            navigateToVehicleList = true
+                        }
                     }
                     
                     VStack(spacing: 18) {
                         ORSectionHeader(title: "Öne Çıkan Kiralık Araçlar", actionTitle: "Tümünü Gör") {
-                            let request = viewModel.buildSearchRequest()
-                            searchRequest = request
-                            navigateToVehicleList = true
+                            if let draft = viewModel.buildReservationDraft() {
+                                reservationDraft = draft
+                                navigateToVehicleList = true
+                            }
                         }
                         
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -52,18 +54,7 @@ struct HomeView: View {
                         }
                     }
                     
-                    VStack(spacing: 18) {
-                        ORSectionHeader(title: "Araç Segmentleri")
-                        
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 14),
-                            GridItem(.flexible(), spacing: 14)
-                        ], spacing: 14) {
-                            ForEach(viewModel.segments) { segment in
-                                SegmentCard(segment: segment)
-                            }
-                        }
-                    }
+                    
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
@@ -73,10 +64,20 @@ struct HomeView: View {
             .task {
                 viewModel.onAppear()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .resetBookingFlow)) { _ in
+                viewModel.resetForm()
+                reservationDraft = nil
+                navigateToVehicleList = false
+            }
             .navigationDestination(isPresented: $navigateToVehicleList) {
-                if let searchRequest {
-                    VehicleListView(searchRequest: searchRequest)
+                if let reservationDraft {
+                    VehicleListView(draft: reservationDraft)
                 }
+            }
+            .alert("Uyarı", isPresented: $viewModel.showSearchErrorAlert) {
+                Button("Tamam", role: .cancel) { }
+            } message: {
+                Text(viewModel.searchErrorMessage)
             }
         }
     }

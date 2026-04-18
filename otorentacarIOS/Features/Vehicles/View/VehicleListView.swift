@@ -15,9 +15,9 @@ struct VehicleListView: View {
     @State private var selectedVehicle: Vehicle?
     @State private var navigateToExtras = false
     
-    init(searchRequest: ReservationSearchRequest) {
+    init(draft: ReservationDraft) {
         _viewModel = StateObject(
-            wrappedValue: VehicleListViewModel(searchRequest: searchRequest)
+            wrappedValue: VehicleListViewModel(draft: draft)
         )
     }
     
@@ -46,8 +46,7 @@ struct VehicleListView: View {
         .navigationDestination(isPresented: $navigateToExtras) {
             if let selectedVehicle {
                 ExtraServicesView(
-                    vehicle: selectedVehicle,
-                    searchRequest: viewModel.searchRequest
+                    draft: viewModel.buildDraft(with: selectedVehicle)
                 )
             }
         }
@@ -90,7 +89,7 @@ struct VehicleListView: View {
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text("\(viewModel.searchRequest.pickUpLocation) • \(FormatterHelper.shortDate.string(from: viewModel.searchRequest.pickUpDate))")
+            Text("\(viewModel.draft.pickUpLocation?.name ?? "") • \(FormatterHelper.shortDate.string(from: viewModel.draft.pickUpDate))")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }

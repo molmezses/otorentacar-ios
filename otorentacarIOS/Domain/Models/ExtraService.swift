@@ -12,6 +12,7 @@ struct ExtraService: Identifiable, Codable, Hashable {
     let title: String
     let description: String?
     let pricePerDay: Double
+    let maxCount: Int
     var isSelected: Bool
     var quantity: Int
     let type: ExtraServiceType
