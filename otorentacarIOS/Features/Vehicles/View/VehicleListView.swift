@@ -140,10 +140,13 @@ struct VehicleListView: View {
         } else {
             LazyVStack(spacing: 18) {
                 ForEach(viewModel.vehicles) { vehicle in
-                    VehicleListCard(vehicle: vehicle) {
-                        selectedVehicle = vehicle
-                        navigateToExtras = true
-                    }
+                    VehicleListCard(
+                        vehicle: vehicle,
+                        selectAction: {
+                            selectedVehicle = vehicle
+                            navigateToExtras = true
+                        }
+                    )
                 }
             }
         }

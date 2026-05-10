@@ -16,10 +16,11 @@ struct SideMenuItem: Identifiable, Hashable {
 
 enum SideMenuDestination: Hashable {
     case home
-    case bookings
+    case myReservations
+    case favorites
+    case query
     case about
     case services
-    case faq
     case contact
 }
 

@@ -97,7 +97,10 @@ struct ReservationDetailView: View {
         .background(AppColors.background.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
         .navigationDestination(isPresented: $viewModel.navigateToSuccess) {
-            ReservationSuccessView(reservationCode: viewModel.reservationCode)
+            ReservationSuccessView(
+                reservationCode: viewModel.reservationCode,
+                storedReservation: viewModel.makeStoredReservation()
+            )
         }
     }
     

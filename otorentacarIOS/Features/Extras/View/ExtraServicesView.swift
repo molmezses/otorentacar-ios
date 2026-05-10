@@ -266,6 +266,7 @@ struct ExtraServicesView: View {
                     .frame(height: 58)
                     .background(AppColors.inputBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .foregroundStyle(.black)
                 }
             }
         }

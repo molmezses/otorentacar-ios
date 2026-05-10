@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainContainerView: View {
-    @State private var selectedTab: AppTab = .home
+    @State private var selectedTab: AppTab = .reservation
     @State private var showMenu = false
     @State private var selectedMenuDestination: SideMenuDestination? = nil
     @StateObject private var sessionManager = SessionManager()
@@ -48,7 +48,7 @@ struct MainContainerView: View {
                                     showMenu.toggle()
                                 }
                             }
-                        case .home, .bookings, .contact, .faq:
+                        case .home, .myReservations, .favorites, .query, .contact:
                             tabContentView
                         }
                     } else {
@@ -144,18 +144,31 @@ struct MainContainerView: View {
     @ViewBuilder
     private var tabContentView: some View {
         switch selectedTab {
-        case .home:
+        case .reservation:
             HomeView {
                 withAnimation(.spring()) {
                     showMenu.toggle()
                 }
             }
-        case .bookings:
+            
+        case .myReservations:
+            NavigationStack {
+                MyReservationsView {
+                    selectedMenuDestination = nil
+                    selectedTab = .reservation
+                }
+            }
+            
+        case .favorites:
+            FavoritesView()
+            
+        case .query:
             BookingQueryView {
                 withAnimation(.spring()) {
                     showMenu.toggle()
                 }
             }
+            
         case .contact:
             ContactView {
                 withAnimation(.spring()) {
@@ -171,10 +184,14 @@ struct MainContainerView: View {
         }
         
         switch selectedTab {
-        case .home:
+        case .reservation:
             return .home
-        case .bookings:
-            return .bookings
+        case .myReservations:
+            return .myReservations
+        case .favorites:
+            return .favorites
+        case .query:
+            return .query
         case .contact:
             return .contact
         }
@@ -185,24 +202,31 @@ struct MainContainerView: View {
             switch destination {
             case .home:
                 selectedMenuDestination = nil
-                selectedTab = .home
-            case .bookings:
+                selectedTab = .reservation
+                
+            case .myReservations:
                 selectedMenuDestination = nil
-                selectedTab = .bookings
+                selectedTab = .myReservations
+                
+            case .favorites:
+                selectedMenuDestination = nil
+                selectedTab = .favorites
+                
+            case .query:
+                selectedMenuDestination = nil
+                selectedTab = .query
+                
             case .contact:
                 selectedMenuDestination = nil
                 selectedTab = .contact
+                
             case .about:
                 selectedMenuDestination = .about
+                
             case .services:
                 selectedMenuDestination = .services
-            case .faq:
-                selectedMenuDestination = .faq
             }
             showMenu = false
         }
     }
 }
-
-
-

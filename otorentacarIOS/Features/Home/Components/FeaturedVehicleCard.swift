@@ -10,11 +10,12 @@ import SwiftUI
 struct FeaturedVehicleCard: View {
     let vehicle: Vehicle
     @State private var isFavorite: Bool
+
+    init(vehicle: Vehicle) {
+        self.vehicle = vehicle
+        _isFavorite = State(initialValue: LocalStorageManager.shared.isFavorite(vehicleId: vehicle.id))
+    }
         
-        init(vehicle: Vehicle) {
-            self.vehicle = vehicle
-            _isFavorite = State(initialValue: vehicle.isFavorite)
-        }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -32,16 +33,23 @@ struct FeaturedVehicleCard: View {
                 Spacer()
                 
                 Button {
-                                    isFavorite.toggle()
-                                } label: {
-                                    RoundedRectangle(cornerRadius: 14)
-                                        .fill(AppColors.inputBackground)
-                                        .frame(width: 48, height: 48)
-                                        .overlay(
-                                            Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                                .foregroundColor(AppColors.primary)
-                                        )
-                                }
+                    isFavorite.toggle()
+
+                    if isFavorite {
+                        LocalStorageManager.shared.saveFavorite(vehicle)
+                    } else {
+                        LocalStorageManager.shared.removeFavorite(vehicleId: vehicle.id)
+                    }
+                } label: {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(isFavorite ? AppColors.primarySoft : AppColors.inputBackground)
+                        .frame(width: 46, height: 46)
+                        .overlay(
+                            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(isFavorite ? AppColors.primary : AppColors.textSecondary)
+                        )
+                }
             }
             
             RoundedRectangle(cornerRadius: 16)

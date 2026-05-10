@@ -20,7 +20,7 @@ struct Vehicle: Identifiable, Codable, Hashable {
     let totalPrice: Double
     let imageURL: String?
     let badge: String?
-    let isFavorite: Bool
+    var isFavorite: Bool
     let currencyId: Int?
     let currencyCode: String?
 }

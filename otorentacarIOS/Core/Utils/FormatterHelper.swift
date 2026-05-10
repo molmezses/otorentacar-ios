@@ -85,6 +85,13 @@ enum FormatterHelper {
         return calendar.date(from: result) ?? date
     }
     
+    static let fullDate: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "dd MMM yyyy, HH:mm"
+        return formatter
+    }()
+    
     static func currencyString(_ value: Double, code: String?) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency

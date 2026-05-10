@@ -226,4 +226,23 @@ final class ReservationDetailViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+    
+    func makeStoredReservation() -> StoredReservation? {
+        guard let vehicle = selectedVehicle else { return nil }
+        guard !reservationCode.isEmpty else { return nil }
+
+        return StoredReservation(
+            trackingCode: reservationCode,
+            vehicleName: vehicle.name,
+            vehicleBrand: vehicle.brand,
+            imageURL: vehicle.imageURL,
+            pickUpLocation: draft.pickUpLocation?.name ?? "",
+            dropOffLocation: draft.dropOffLocation?.name ?? "",
+            pickUpDate: draft.pickUpDate,
+            dropOffDate: draft.dropOffDate,
+            totalAmount: grandTotal,
+            currencyCode: draft.currencyCode ?? vehicle.currencyCode,
+            status: "Yeni"
+        )
+    }
 }

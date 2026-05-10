@@ -10,7 +10,9 @@ import SwiftUI
 struct SideMenuView: View {
     let items: [SideMenuItem] = [
         .init(title: "Anasayfa", icon: "house.fill", destination: .home),
-        .init(title: "Rezervasyonlarım", icon: "car.fill", destination: .bookings),
+        .init(title: "Rezervasyonlarım", icon: "car.fill", destination: .myReservations),
+        .init(title: "Favorilerim", icon: "heart.fill", destination: .favorites),
+        .init(title: "Sorgula", icon: "magnifyingglass", destination: .query),
         .init(title: "Hakkımızda", icon: "info.circle.fill", destination: .about),
         .init(title: "Hizmetlerimiz", icon: "cross.case.fill", destination: .services),
         .init(title: "İletişim", icon: "at", destination: .contact)

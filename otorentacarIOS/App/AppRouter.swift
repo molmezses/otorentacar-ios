@@ -7,23 +7,29 @@
 
 import Foundation
 
-enum AppTab: String, CaseIterable {
-    case home
-    case bookings
+enum AppTab: CaseIterable, Hashable {
+    case reservation
+    case myReservations
+    case favorites
+    case query
     case contact
-    
+
     var title: String {
         switch self {
-        case .home: return "Rezervasyon"
-        case .bookings: return "Rezervasyon Sorgula"
-        case .contact: return "Iletisim"
+        case .reservation: return "Rezervasyon"
+        case .myReservations: return "Rezervasyonlarım"
+        case .favorites: return "Favorilerim"
+        case .query: return "Sorgula"
+        case .contact: return "İletişim"
         }
     }
-    
+
     var icon: String {
         switch self {
-        case .home: return "house.fill"
-        case .bookings: return "calendar"
+        case .reservation: return "house.fill"
+        case .myReservations: return "calendar"
+        case .favorites: return "heart.fill"
+        case .query: return "magnifyingglass"
         case .contact: return "headphones"
         }
     }

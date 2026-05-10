@@ -16,6 +16,7 @@ extension Notification.Name {
 
 struct ReservationSuccessView: View {
     let reservationCode: String
+    let storedReservation: StoredReservation?
     @Environment(\.dismiss) private var dismiss
     @State private var copied = false
 
@@ -117,5 +118,10 @@ struct ReservationSuccessView: View {
         }
         .background(AppColors.background.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            if let storedReservation {
+                LocalStorageManager.shared.saveReservation(storedReservation)
+            }
+        }
     }
 }

@@ -9,8 +9,22 @@
 import SwiftUI
 
 struct VehicleListCard: View {
+
     let vehicle: Vehicle
+
     var selectAction: (() -> Void)? = nil
+
+    @State private var isFavorite: Bool
+
+    init(vehicle: Vehicle, selectAction: (() -> Void)? = nil) {
+
+        self.vehicle = vehicle
+
+        self.selectAction = selectAction
+
+        _isFavorite = State(initialValue: LocalStorageManager.shared.isFavorite(vehicleId: vehicle.id))
+
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -37,13 +51,22 @@ struct VehicleListCard: View {
                 
                 Spacer()
                 
-                Button {} label: {
+                Button {
+                    isFavorite.toggle()
+
+                    if isFavorite {
+                        LocalStorageManager.shared.saveFavorite(vehicle)
+                    } else {
+                        LocalStorageManager.shared.removeFavorite(vehicleId: vehicle.id)
+                    }
+                } label: {
                     RoundedRectangle(cornerRadius: 14)
-                        .fill(AppColors.inputBackground)
+                        .fill(isFavorite ? AppColors.primarySoft : AppColors.inputBackground)
                         .frame(width: 46, height: 46)
                         .overlay(
-                            Image(systemName: vehicle.isFavorite ? "heart.fill" : "heart")
-                                .foregroundColor(AppColors.primary)
+                            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(isFavorite ? AppColors.primary : AppColors.textSecondary)
                         )
                 }
             }
