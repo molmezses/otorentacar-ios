@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct FeaturedVehicleCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let vehicle: Vehicle
     @State private var isFavorite: Bool
 
@@ -95,14 +97,14 @@ struct FeaturedVehicleCard: View {
             
             HStack(alignment: .bottom) {
                 HStack(spacing: 6) {
-                    vehicleSpecBadge(icon: "gearshape.fill", title: vehicle.transmission)
-                    vehicleSpecBadge(icon: "fuelpump.fill", title: vehicle.fuelType)
+                    vehicleSpecBadge(icon: "gearshape.fill", title: languageManager.localizedVehicleSpec(vehicle.transmission))
+                    vehicleSpecBadge(icon: "fuelpump.fill", title: languageManager.localizedVehicleSpec(vehicle.fuelType))
                 }
                 
                 Spacer(minLength: 12)
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("Günlük")
+                    Text(languageManager.localized(turkish: "Günlük", english: "Daily"))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                     
@@ -127,7 +129,7 @@ private func vehicleSpecBadge(icon: String, title: String) -> some View {
             .font(.system(size: 11, weight: .semibold))
             .foregroundColor(AppColors.primary)
         
-        Text(formattedSpecTitle(title))
+        Text(normalizedSpecText(title))
             .font(.system(size: 12, weight: .semibold))
             .foregroundColor(AppColors.primaryDark)
             .fixedSize(horizontal: true, vertical: false)

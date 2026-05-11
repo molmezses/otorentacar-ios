@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SegmentCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let segment: VehicleSegment
     
     var body: some View {
@@ -27,7 +29,7 @@ struct SegmentCard: View {
                     .foregroundColor(AppColors.textPrimary)
                     .lineLimit(1)
                 
-                Text("\(segment.vehicleCount) ARAÇ")
+                Text(languageManager.localized(turkish: "\(segment.vehicleCount) ARAÇ", english: "\(segment.vehicleCount) CARS"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
                     .lineLimit(1)

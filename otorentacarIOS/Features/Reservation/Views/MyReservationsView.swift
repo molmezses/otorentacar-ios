@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct MyReservationsView: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     var onCreateReservationTap: (() -> Void)? = nil
     
     @State private var reservations: [StoredReservation] = []
@@ -22,9 +23,16 @@ struct MyReservationsView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Rezervasyonlarım")
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(AppColors.textPrimary)
+                HStack {
+                    Text(languageManager.localized(turkish: "Rezervasyonlarım", english: "My Bookings"))
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundColor(AppColors.textPrimary)
+
+                    Spacer()
+
+                    LanguageToggleButton()
+                }
+                .frame(maxWidth: .infinity)
                 
                 if reservations.isEmpty {
                     VStack(spacing: 14) {
@@ -32,11 +40,14 @@ struct MyReservationsView: View {
                             .font(.system(size: 42))
                             .foregroundColor(AppColors.primary)
                         
-                        Text("Henüz kayıtlı rezervasyonunuz yok")
+                        Text(languageManager.localized(turkish: "Henüz kayıtlı rezervasyonunuz yok", english: "You do not have saved bookings yet"))
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(AppColors.textPrimary)
                         
-                        Text("Yeni bir rezervasyon oluşturduğunuzda burada görüntüleyebilirsiniz.")
+                        Text(languageManager.localized(
+                            turkish: "Yeni bir rezervasyon oluşturduğunuzda burada görüntüleyebilirsiniz.",
+                            english: "When you create a new booking, you can view it here."
+                        ))
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(AppColors.textSecondary)
                             .multilineTextAlignment(.center)
@@ -44,7 +55,7 @@ struct MyReservationsView: View {
                         Button {
                             onCreateReservationTap?()
                         } label: {
-                            Text("Rezervasyon Oluştur")
+                            Text(languageManager.localized(turkish: "Rezervasyon Oluştur", english: "Create Booking"))
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -97,7 +108,7 @@ struct MyReservationsView: View {
         
         
     }
-    
+
     private func loadReservationDetail(trackingCode: String) {
         Task {
             isLoadingDetail = true
@@ -108,7 +119,10 @@ struct MyReservationsView: View {
                 fetchedReservation = reservation
                 navigateToDetail = true
             } catch {
-                errorMessage = "Rezervasyon detayı alınamadı."
+                errorMessage = languageManager.localized(
+                    turkish: "Rezervasyon detayı alınamadı.",
+                    english: "Booking detail could not be loaded."
+                )
             }
             
             isLoadingDetail = false
@@ -131,7 +145,7 @@ struct MyReservationsView: View {
                 Spacer()
                 
                 HStack( spacing: 10) {
-                    Text(item.status)
+                    Text(localizedStatus(item.status))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(AppColors.primary)
                         .padding(.horizontal, 12)
@@ -153,15 +167,15 @@ struct MyReservationsView: View {
                 }
             }
             
-            Text("Alış: \(item.pickUpLocation)")
+            Text("\(languageManager.localized(turkish: "Alış", english: "Pick-up")): \(item.pickUpLocation)")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
             
-            Text("Dönüş: \(item.dropOffLocation)")
+            Text("\(languageManager.localized(turkish: "Dönüş", english: "Return")): \(item.dropOffLocation)")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
             
-            Text("\(FormatterHelper.fullDate.string(from: item.pickUpDate)) - \(FormatterHelper.fullDate.string(from: item.dropOffDate))")
+            Text("\(languageManager.fullDateString(from: item.pickUpDate)) - \(languageManager.fullDateString(from: item.dropOffDate))")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
             
@@ -172,7 +186,7 @@ struct MyReservationsView: View {
             Button {
                 loadReservationDetail(trackingCode: item.trackingCode)
             } label: {
-                Text("Detayı Gör")
+                Text(languageManager.localized(turkish: "Detayı Gör", english: "View Details"))
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -186,6 +200,15 @@ struct MyReservationsView: View {
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 22))
         .shadow(color: AppColors.shadow, radius: 10, x: 0, y: 6)
+    }
+
+    private func localizedStatus(_ status: String) -> String {
+        switch status.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "yeni", "new":
+            return languageManager.localized(turkish: "Yeni", english: "New")
+        default:
+            return status
+        }
     }
     
 }

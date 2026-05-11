@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct ServicesView: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     var onMenuTap: () -> Void
     
     var body: some View {
@@ -23,32 +24,47 @@ struct ServicesView: View {
                 LazyVStack(spacing: 16) {
                     serviceCard(
                         icon: "phone.fill",
-                        title: "7/24 Araç Kiralama Destek Hattı",
-                        description: "7 gün 24 saat yol yardımı ekibi. Kiralama süresince meydana gelebilecek acil, öngörülemeyen kaza ve/veya durumlar ile ilgili olarak Otorentacar destek hattına başvurabilirsiniz."
+                        title: languageManager.localized(turkish: "7/24 Araç Kiralama Destek Hattı", english: "24/7 Car Rental Support Line"),
+                        description: languageManager.localized(
+                            turkish: "7 gün 24 saat yol yardımı ekibi. Kiralama süresince meydana gelebilecek acil, öngörülemeyen kaza ve/veya durumlar ile ilgili olarak Otorentacar destek hattına başvurabilirsiniz.",
+                            english: "Our roadside support team is available 24/7. You can contact Otorentacar for urgent or unexpected situations during your rental."
+                        )
                     )
                     
                     serviceCard(
                         icon: "key.fill",
-                        title: "Ücretsiz Teslim İmkanı",
-                        description: "Aracınızı bir telefonla siz nerede olursanız olun ayağınıza getiriyoruz ve bunun için sizden ek ücret talep etmiyoruz."
+                        title: languageManager.localized(turkish: "Ücretsiz Teslim İmkanı", english: "Free Delivery Option"),
+                        description: languageManager.localized(
+                            turkish: "Aracınızı bir telefonla siz nerede olursanız olun ayağınıza getiriyoruz ve bunun için sizden ek ücret talep etmiyoruz.",
+                            english: "We can deliver your car to your location with a quick call, without charging an additional fee."
+                        )
                     )
                     
                     serviceCard(
                         icon: "leaf.fill",
-                        title: "Temiz ve Bakımlı Araçlar",
-                        description: "Müşterilerimizin herhangi bir problem yaşamaması amacıyla araçlarımızı size sunmadan önce yıkayıp ve bakımlarını eksiksiz gözden geçiriyoruz."
+                        title: languageManager.localized(turkish: "Temiz ve Bakımlı Araçlar", english: "Clean and Maintained Cars"),
+                        description: languageManager.localized(
+                            turkish: "Müşterilerimizin herhangi bir problem yaşamaması amacıyla araçlarımızı size sunmadan önce yıkayıp ve bakımlarını eksiksiz gözden geçiriyoruz.",
+                            english: "Before delivery, our cars are cleaned and checked so you can enjoy a smooth rental experience."
+                        )
                     )
                     
                     serviceCard(
                         icon: "car.fill",
-                        title: "Lüks ve Konforlu Araçlar",
-                        description: "Deneyimli personeli ve güvenli araçlarıyla alışmış olduğunuz konfor ve ayrıcalık, artık lüks araç ihtiyaçlarınızda da aynı özenle size sunulur."
+                        title: languageManager.localized(turkish: "Lüks ve Konforlu Araçlar", english: "Luxury and Comfortable Cars"),
+                        description: languageManager.localized(
+                            turkish: "Deneyimli personeli ve güvenli araçlarıyla alışmış olduğunuz konfor ve ayrıcalık, artık lüks araç ihtiyaçlarınızda da aynı özenle size sunulur.",
+                            english: "With experienced staff and reliable vehicles, we bring comfort and care to your luxury car needs."
+                        )
                     )
                     
                     serviceCard(
                         icon: "square.stack.3d.up.fill",
-                        title: "Farklı Araba Seçenekleri",
-                        description: "Bütçenize uygun size kaliteli araçlar sunuyoruz. Lüks, aile, sedan, ekonomik gibi seçeneklerle araç seçmenizi kolaylaştırıyoruz."
+                        title: languageManager.localized(turkish: "Farklı Araba Seçenekleri", english: "Different Car Options"),
+                        description: languageManager.localized(
+                            turkish: "Bütçenize uygun size kaliteli araçlar sunuyoruz. Lüks, aile, sedan, ekonomik gibi seçeneklerle araç seçmenizi kolaylaştırıyoruz.",
+                            english: "We offer quality cars for different budgets, including luxury, family, sedan and economy options."
+                        )
                     )
                 }
             }
@@ -61,11 +77,11 @@ struct ServicesView: View {
     
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Hizmetlerimiz")
+            Text(languageManager.localized(turkish: "Hizmetlerimiz", english: "Our Services"))
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text("Otorentacar ile sunduğumuz avantajlar")
+            Text(languageManager.localized(turkish: "Otorentacar ile sunduğumuz avantajlar", english: "Advantages we offer with Otorentacar"))
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -73,11 +89,17 @@ struct ServicesView: View {
     
     private var introCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Size uygun fiyatlı araç kiralama seçeneklerini sunuyoruz.")
+            Text(languageManager.localized(
+                turkish: "Size uygun fiyatlı araç kiralama seçeneklerini sunuyoruz.",
+                english: "We offer affordable car rental options for you."
+            ))
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text("Otorentacar ile uygun fiyatlı araç kiralama seçeneklerini bulun, hemen yola koyulun. Filomuzdaki araçlar arasında arama yapın. Anında fiyatları karşılaştırın. Ardından seçtiğiniz araç için doğrudan rezervasyon yapın.")
+            Text(languageManager.localized(
+                turkish: "Otorentacar ile uygun fiyatlı araç kiralama seçeneklerini bulun, hemen yola koyulun. Filomuzdaki araçlar arasında arama yapın. Anında fiyatları karşılaştırın. Ardından seçtiğiniz araç için doğrudan rezervasyon yapın.",
+                english: "Find affordable car rental options with Otorentacar and get on the road. Search our fleet, compare prices instantly, then book your selected car directly."
+            ))
                 .font(.system(size: 16, weight: .regular))
                 .foregroundColor(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)

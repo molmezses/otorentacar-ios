@@ -9,34 +9,34 @@
 import SwiftUI
 
 struct PersonalInfoFormSection: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     @ObservedObject var viewModel: ReservationDetailViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            sectionTitle("Kişisel Bilgiler", systemImage: "person.fill")
+            sectionTitle(languageManager.localized(turkish: "Kişisel Bilgiler", english: "Personal Information"), systemImage: "person.fill")
             
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 14) {
                     VStack(alignment: .leading, spacing: 10) {
-                        fieldTitle("Ad")
+                        fieldTitle(languageManager.localized(turkish: "Ad", english: "Name"))
                         textField("Mehmet", text: $viewModel.name)
                     }
 
                     VStack(alignment: .leading, spacing: 10) {
-                        fieldTitle("Soyad")
-                        textField("Yılmaz", text: $viewModel.surname)
+                        fieldTitle(languageManager.localized(turkish: "Soyad", english: "Surname"))
+                        textField(languageManager.localized(turkish: "Yılmaz", english: "Smith"), text: $viewModel.surname)
                     }
                 }
 
-                fieldTitle("Telefon")
-                textField("+90 5XX XXX XX XX", text: $viewModel.phone)
-                    .keyboardType(.phonePad)
+                fieldTitle(languageManager.localized(turkish: "Telefon", english: "Phone"))
+                phoneField
 
-                fieldTitle("Doğum Tarihi")
+                fieldTitle(languageManager.localized(turkish: "Doğum Tarihi", english: "Birth Date"))
 
                 if viewModel.isReadOnly {
                     HStack {
-                        Text(FormatterHelper.shortDate.string(from: viewModel.birthDate))
+                        Text(languageManager.shortDateString(from: viewModel.birthDate))
                             .font(.system(size: 17, weight: .medium))
                             .foregroundColor(AppColors.textPrimary)
 
@@ -56,12 +56,12 @@ struct PersonalInfoFormSection: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
 
-                fieldTitle("E-Posta")
+                fieldTitle(languageManager.localized(turkish: "E-Posta", english: "Email"))
                 textField("mehmet@email.com", text: $viewModel.email)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
 
-                fieldTitle("Uçuş Kodu (Opsiyonel)")
+                fieldTitle(languageManager.localized(turkish: "Uçuş Kodu (Opsiyonel)", english: "Flight Code (Optional)"))
                 textField("TK 1923", text: $viewModel.flightCode)
             }
             .padding(18)
@@ -96,5 +96,56 @@ struct PersonalInfoFormSection: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .disabled(viewModel.isReadOnly)
             .foregroundStyle(.black)
+    }
+
+    private var phoneField: some View {
+        HStack(spacing: 10) {
+            Menu {
+                ForEach(phoneCountryCodes, id: \.self) { code in
+                    Button {
+                        viewModel.phoneCountryCode = code
+                    } label: {
+                        HStack {
+                            Text(code)
+                            if viewModel.phoneCountryCode == code {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(viewModel.phoneCountryCode)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(AppColors.textPrimary)
+                        .lineLimit(1)
+
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(AppColors.primary)
+                }
+                .frame(width: 86, height: 58)
+                .background(viewModel.isReadOnly ? Color.gray.opacity(0.12) : AppColors.inputBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .disabled(viewModel.isReadOnly)
+
+            TextField(languageManager.localized(turkish: "5XX XXX XX XX", english: "Phone number"), text: $viewModel.phone)
+                .keyboardType(.phonePad)
+                .padding()
+                .frame(height: 58)
+                .background(viewModel.isReadOnly ? Color.gray.opacity(0.12) : AppColors.inputBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .disabled(viewModel.isReadOnly)
+                .foregroundStyle(.black)
+        }
+    }
+
+    private var phoneCountryCodes: [String] {
+        [
+            "+90", "+44", "+1", "+7", "+20", "+27", "+30", "+31", "+32", "+33",
+            "+34", "+36", "+39", "+40", "+41", "+43", "+45", "+46", "+47", "+49",
+            "+52", "+55", "+61", "+81", "+86", "+971", "+973", "+974", "+994"
+        ]
     }
 }

@@ -9,14 +9,22 @@
 import SwiftUI
 
 struct FavoritesView: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     @State private var favorites: [Vehicle] = []
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Favorilerim")
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(AppColors.textPrimary)
+                HStack {
+                    Text(languageManager.localized(turkish: "Favorilerim", english: "Favorites"))
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundColor(AppColors.textPrimary)
+
+                    Spacer()
+
+                    LanguageToggleButton()
+                }
+                .frame(maxWidth: .infinity)
 
                 if favorites.isEmpty {
                     VStack(spacing: 14) {
@@ -24,11 +32,14 @@ struct FavoritesView: View {
                             .font(.system(size: 42))
                             .foregroundColor(AppColors.primary)
 
-                        Text("Henüz favori aracınız yok")
+                        Text(languageManager.localized(turkish: "Henüz favori aracınız yok", english: "You do not have favorite cars yet"))
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(AppColors.textPrimary)
 
-                        Text("Beğendiğiniz araçları favorilere ekleyerek daha sonra hızlıca görüntüleyebilirsiniz.")
+                        Text(languageManager.localized(
+                            turkish: "Beğendiğiniz araçları favorilere ekleyerek daha sonra hızlıca görüntüleyebilirsiniz.",
+                            english: "Add cars you like to favorites so you can view them quickly later."
+                        ))
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(AppColors.textSecondary)
                             .multilineTextAlignment(.center)
@@ -122,4 +133,5 @@ struct FavoritesView: View {
         .clipShape(RoundedRectangle(cornerRadius: 22))
         .shadow(color: AppColors.shadow, radius: 10, x: 0, y: 6)
     }
+
 }

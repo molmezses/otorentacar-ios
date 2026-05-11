@@ -8,15 +8,7 @@
 import SwiftUI
 
 struct SideMenuView: View {
-    let items: [SideMenuItem] = [
-        .init(title: "Anasayfa", icon: "house.fill", destination: .home),
-        .init(title: "Rezervasyonlarım", icon: "car.fill", destination: .myReservations),
-        .init(title: "Favorilerim", icon: "heart.fill", destination: .favorites),
-        .init(title: "Sorgula", icon: "magnifyingglass", destination: .query),
-        .init(title: "Hakkımızda", icon: "info.circle.fill", destination: .about),
-        .init(title: "Hizmetlerimiz", icon: "cross.case.fill", destination: .services),
-        .init(title: "İletişim", icon: "at", destination: .contact)
-    ]
+    @EnvironmentObject private var languageManager: AppLanguageManager
     
     let selectedDestination: SideMenuDestination
     var onItemTap: (SideMenuDestination) -> Void
@@ -40,7 +32,7 @@ struct SideMenuView: View {
                                     : AppColors.textSecondary
                                 )
                             
-                            Text(item.title)
+                            Text(item.title(language: languageManager.language))
                                 .font(.system(size: 20, weight: selectedDestination == item.destination ? .semibold : .regular))
                                 .foregroundColor(
                                     selectedDestination == item.destination
@@ -62,6 +54,18 @@ struct SideMenuView: View {
         .frame(maxWidth: 320, maxHeight: .infinity, alignment: .topLeading)
         .background(Color.white)
     }
+
+    private var items: [SideMenuItem] {
+        [
+            .init(turkishTitle: "Anasayfa", englishTitle: "Home", icon: "house.fill", destination: .home),
+            .init(turkishTitle: "Rezervasyonlarım", englishTitle: "My Bookings", icon: "car.fill", destination: .myReservations),
+            .init(turkishTitle: "Favorilerim", englishTitle: "Favorites", icon: "heart.fill", destination: .favorites),
+            .init(turkishTitle: "Sorgula", englishTitle: "Query", icon: "magnifyingglass", destination: .query),
+            .init(turkishTitle: "Hakkımızda", englishTitle: "About Us", icon: "info.circle.fill", destination: .about),
+            .init(turkishTitle: "Hizmetlerimiz", englishTitle: "Services", icon: "cross.case.fill", destination: .services),
+            .init(turkishTitle: "İletişim", englishTitle: "Contact", icon: "at", destination: .contact)
+        ]
+    }
     
     private var topSection: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -81,11 +85,14 @@ struct SideMenuView: View {
                 Text("Otorentacar")
                     .font(.system(size: 24, weight: .bold))                    .foregroundColor(AppColors.textPrimary)
                 
-                Text("Hoş geldiniz")
+                Text(languageManager.localized(turkish: "Hoş geldiniz", english: "Welcome"))
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(AppColors.primary)
                 
-                Text("Araç kiralama işlemlerini hızlı ve kolay şekilde yönetebilirsiniz.")
+                Text(languageManager.localized(
+                    turkish: "Araç kiralama işlemlerini hızlı ve kolay şekilde yönetebilirsiniz.",
+                    english: "Manage car rental tasks quickly and easily."
+                ))
                     .font(.system(size: 15, weight: .regular))
                     .foregroundColor(AppColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -94,21 +101,6 @@ struct SideMenuView: View {
     }
     
     private var logoView: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .fill(AppColors.primary)
-            .frame(width: 132, height: 38)
-            .overlay(
-                VStack(spacing: 3) {
-                    Text("Otorentacar")
-                        .font(.system(size: 13, weight: .heavy))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.85)
-
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.yellow.opacity(0.9))
-                        .frame(width: 68, height: 2.5)
-                }
-            )
+        OtorentacarLogoView(width: 142, height: 44, cornerRadius: 11)
     }
 }

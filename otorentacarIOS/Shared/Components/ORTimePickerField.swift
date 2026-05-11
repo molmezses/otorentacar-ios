@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ORTimePickerField: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let title: String
     @Binding var time: Date
     
@@ -17,24 +19,28 @@ struct ORTimePickerField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title.uppercased())
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
             
             Button {
                 showTimePickerSheet = true
             } label: {
-                HStack {
+                HStack(spacing: 6) {
                     Text(FormatterHelper.timeString.string(from: time))
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(AppColors.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     
-                    Spacer()
+                    Spacer(minLength: 4)
                     
                     Image(systemName: "clock")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(AppColors.primary)
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 10)
                 .frame(height: 58)
                 .background(AppColors.inputBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -44,7 +50,7 @@ struct ORTimePickerField: View {
                 NavigationStack {
                     VStack(spacing: 24) {
                         DatePicker(
-                            "Saat Seç",
+                            languageManager.localized(turkish: "Saat Seç", english: "Select Time"),
                             selection: $time,
                             displayedComponents: .hourAndMinute
                         )
@@ -56,11 +62,11 @@ struct ORTimePickerField: View {
                         Spacer()
                     }
                     .padding(.top, 20)
-                    .navigationTitle("Saat Seç")
+                    .navigationTitle(languageManager.localized(turkish: "Saat Seç", english: "Select Time"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button("Tamam") {
+                            Button(languageManager.localized(turkish: "Tamam", english: "Done")) {
                                 showTimePickerSheet = false
                             }
                             .foregroundColor(AppColors.primary)
@@ -70,5 +76,6 @@ struct ORTimePickerField: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

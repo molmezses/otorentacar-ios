@@ -93,14 +93,53 @@ enum FormatterHelper {
     }()
     
     static func currencyString(_ value: Double, code: String?) -> String {
+        let normalizedCode = code?.uppercased() ?? "EUR"
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 0
-        formatter.currencyCode = code ?? "EUR"
-        formatter.locale = Locale(identifier: "en_IE")
+        formatter.currencyCode = normalizedCode
+
+        if normalizedCode == "TRY" {
+            formatter.locale = Locale(identifier: "tr_TR")
+            formatter.currencySymbol = "₺"
+        } else {
+            formatter.locale = Locale(identifier: "en_IE")
+        }
         
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+
+    static func displayCurrencyString(
+        _ value: Double,
+        originalCode: String?,
+        displayCurrency: PriceDisplayCurrency
+    ) -> String {
+        currencyString(
+            convertedCurrencyValue(
+                value,
+                originalCode: originalCode,
+                displayCurrency: displayCurrency
+            ),
+            code: displayCurrency.rawValue
+        )
+    }
+
+    static func convertedCurrencyValue(
+        _ value: Double,
+        originalCode: String?,
+        displayCurrency: PriceDisplayCurrency
+    ) -> Double {
+        let normalizedCode = originalCode?.uppercased() ?? "EUR"
+
+        switch (normalizedCode, displayCurrency) {
+        case ("EUR", .tryCurrency):
+            return value * AppConstants.eurToTryRate
+        case ("TRY", .eur):
+            return value / AppConstants.eurToTryRate
+        default:
+            return value
+        }
     }
     
     static let apiDateTimeParser: DateFormatter = {

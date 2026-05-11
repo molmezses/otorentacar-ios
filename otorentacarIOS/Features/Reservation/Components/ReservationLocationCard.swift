@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ReservationLocationCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let title: String
     let location: String
     let date: Date
@@ -25,7 +27,7 @@ struct ReservationLocationCard: View {
                 .foregroundColor(AppColors.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
             
-            Text("\(FormatterHelper.shortDate.string(from: date)), \(time)")
+            Text("\(languageManager.shortDateString(from: date)), \(time)")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }

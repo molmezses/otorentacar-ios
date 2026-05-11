@@ -21,6 +21,7 @@ struct ReservationDraft {
     var selectedVehicleModelId: Int?
     var currencyId: Int?
     var currencyCode: String?
+    var displayCurrency: PriceDisplayCurrency
     
     var selectedExtras: [ExtraService]
     
@@ -38,6 +39,7 @@ struct ReservationDraft {
         selectedVehicleModelId: Int? = nil,
         currencyId: Int? = nil,
         currencyCode: String? = nil,
+        displayCurrency: PriceDisplayCurrency = .eur,
         selectedExtras: [ExtraService] = [],
         customerInfo: CustomerInfo = CustomerInfo(),
         childrenAges: [String] = []
@@ -52,6 +54,7 @@ struct ReservationDraft {
         self.selectedVehicleModelId = selectedVehicleModelId
         self.currencyId = currencyId
         self.currencyCode = currencyCode
+        self.displayCurrency = displayCurrency
         self.selectedExtras = selectedExtras
         self.customerInfo = customerInfo
         self.childrenAges = childrenAges

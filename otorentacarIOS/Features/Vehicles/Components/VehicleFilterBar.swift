@@ -9,12 +9,13 @@
 import SwiftUI
 
 struct VehicleFilterBar: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     @ObservedObject var viewModel: VehicleListViewModel
     
     var body: some View {
         HStack(spacing: 12) {
             filterButton(
-                title: viewModel.selectedFilterTitle,
+                title: languageManager.localized(turkish: "Filtrele", english: "Filter"),
                 icon: "slider.horizontal.3"
             ) {
                 print("Filter tapped")
@@ -22,14 +23,14 @@ struct VehicleFilterBar: View {
             
             Menu {
                 ForEach(VehicleSortOption.allCases) { option in
-                    Button(option.rawValue) {
+                    Button(option.localizedTitle(language: languageManager.language)) {
                         viewModel.applySort(option)
                     }
                 }
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.up.arrow.down")
-                    Text(viewModel.selectedSortOption.rawValue)
+                    Text(viewModel.selectedSortOption.localizedTitle(language: languageManager.language))
                         .lineLimit(1)
                     Spacer(minLength: 0)
                     Image(systemName: "chevron.down")

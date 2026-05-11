@@ -9,12 +9,15 @@
 import SwiftUI
 
 struct ExtraServiceCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let item: ExtraService
     let dayCount: Int
     let onToggle: () -> Void
     let onIncrease: () -> Void
     let onDecrease: () -> Void
     let currencyCode: String?
+    let displayCurrency: PriceDisplayCurrency
     let childrenAges: [String]
     let onChildAgeChange: ((Int, String) -> Void)?
     
@@ -53,13 +56,28 @@ struct ExtraServiceCard: View {
             
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Günlük Ücret")
+                    Text(languageManager.localized(turkish: "Günlük Ücret", english: "Daily Price"))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                     
-                    Text(FormatterHelper.currencyString(item.pricePerDay, code: currencyCode))
+                    Text(FormatterHelper.displayCurrencyString(
+                        item.pricePerDay,
+                        originalCode: currencyCode,
+                        displayCurrency: displayCurrency
+                    ))
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.primary)
+
+                    Text(languageManager.localized(
+                        turkish: "\(dayCount) gün toplam ",
+                        english: "\(dayCount) days total "
+                    ) + FormatterHelper.displayCurrencyString(
+                        item.pricePerDay * Double(max(item.quantity, 1)) * Double(dayCount),
+                        originalCode: currencyCode,
+                        displayCurrency: displayCurrency
+                    ))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(AppColors.textSecondary)
                 }
                 
                 Spacer()
@@ -81,7 +99,7 @@ struct ExtraServiceCard: View {
                         }
                     }
                 }  else {
-                    Text("\(dayCount) gün")
+                    Text(languageManager.localized(turkish: "\(dayCount) gün", english: "\(dayCount) days"))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                 }
@@ -90,12 +108,15 @@ struct ExtraServiceCard: View {
                     VStack(alignment: .leading, spacing: 10) {
                         ForEach(0..<item.quantity, id: \.self) { index in
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("\(index + 1). Çocuk Yaşı")
+                                Text(languageManager.localized(
+                                    turkish: "\(index + 1). Çocuk Yaşı",
+                                    english: "Child \(index + 1) Age"
+                                ))
                                     .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(AppColors.textSecondary)
 
                                 TextField(
-                                    "Yaş giriniz",
+                                    languageManager.localized(turkish: "Yaş giriniz", english: "Enter age"),
                                     text: Binding(
                                         get: {
                                             index < childrenAges.count ? childrenAges[index] : ""

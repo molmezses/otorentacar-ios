@@ -40,6 +40,7 @@ struct ORLocationPickerField: View {
                             : AppColors.textPrimary
                         )
                         .lineLimit(1)
+                        .truncationMode(.tail)
                     
                     Spacer()
                     
@@ -53,5 +54,6 @@ struct ORLocationPickerField: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

@@ -8,22 +8,25 @@
 import SwiftUI
 
 struct SearchFormCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     @ObservedObject var viewModel: HomeViewModel
     var searchAction: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             ORLocationPickerField(
-                title: "Pick-up Location",
-                placeholder: "Şehir veya Havalimanı",
+                title: languageManager.localized(turkish: "Alış Lokasyonu", english: "Pick-up Location"),
+                placeholder: languageManager.localized(turkish: "Şehir veya Havalimanı", english: "City or Airport"),
                 locations: viewModel.availableLocations,
                 selectedLocation: $viewModel.selectedPickUpLocation
             )
             
             HStack {
-                Text("Farklı bir yerde bırak")
+                Text(languageManager.localized(turkish: "Farklı bir yerde bırak", english: "Drop off somewhere else"))
                     .font(.system(size: 18, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.86)
                 
                 Spacer()
                 
@@ -32,42 +35,50 @@ struct SearchFormCard: View {
 
             if viewModel.dropOffDifferentLocation {
                 ORLocationPickerField(
-                    title: "Drop-off Location",
-                    placeholder: "Dönüş Lokasyonu",
+                    title: languageManager.localized(turkish: "İade Lokasyonu", english: "Drop-off Location"),
+                    placeholder: languageManager.localized(turkish: "Dönüş Lokasyonu", english: "Return Location"),
                     locations: viewModel.availableLocations,
                     selectedLocation: $viewModel.selectedDropOffLocation
                 )
             }
 
             VStack(spacing: 14) {
-                HStack(spacing: 14) {
+                HStack(spacing: 10) {
                     ORDateField(
-                        title: "Pick-up Date",
+                        title: languageManager.localized(turkish: "Alış Tarihi", english: "Pick-up Date"),
                         date: $viewModel.pickUpDate
                     )
-                    
+                    .frame(maxWidth: .infinity)
+
                     ORTimePickerField(
-                        title: "Pick-up Time",
+                        title: languageManager.localized(turkish: "Alış Saati", english: "Pick-up Time"),
                         time: $viewModel.pickUpTime
                     )
+                    .frame(maxWidth: .infinity)
                 }
-                
-                HStack(spacing: 14) {
+
+                HStack(spacing: 10) {
                     ORDateField(
-                        title: "Drop-off Date",
+                        title: languageManager.localized(turkish: "İade Tarihi", english: "Drop-off Date"),
                         date: $viewModel.dropOffDate
                     )
-                    
+                    .frame(maxWidth: .infinity)
+
                     ORTimePickerField(
-                        title: "Drop-off Time",
+                        title: languageManager.localized(turkish: "İade Saati", english: "Drop-off Time"),
                         time: $viewModel.dropOffTime
                     )
+                    .frame(maxWidth: .infinity)
                 }
             }
             
-            ORPrimaryButton(title: "Araç Bul", action: searchAction)
+            ORPrimaryButton(
+                title: languageManager.localized(turkish: "Araç Bul", english: "Find Car"),
+                action: searchAction
+            )
         }
         .padding(20)
+        .frame(maxWidth: .infinity)
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 28))
         .shadow(color: AppColors.shadow, radius: 18, x: 0, y: 8)

@@ -11,6 +11,7 @@ import SwiftUI
 struct ReservationDetailView: View {
     @StateObject private var viewModel: ReservationDetailViewModel
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var languageManager: AppLanguageManager
     
     
     init(draft: ReservationDraft, mode: ReservationDetailMode = .create) {
@@ -40,14 +41,14 @@ struct ReservationDetailView: View {
                 
                 HStack(spacing: 14) {
                     ReservationLocationCard(
-                        title: "Alış",
+                        title: languageManager.localized(turkish: "Alış", english: "Pick-up"),
                         location: viewModel.draft.pickUpLocation?.name ?? "",
                         date: viewModel.draft.pickUpDate,
                         time: FormatterHelper.timeString.string(from: viewModel.draft.pickUpTime)
                     )
 
                     ReservationLocationCard(
-                        title: "Dönüş",
+                        title: languageManager.localized(turkish: "Dönüş", english: "Return"),
                         location: viewModel.draft.dropOffLocation?.name ?? viewModel.draft.pickUpLocation?.name ?? "",
                         date: viewModel.draft.dropOffDate,
                         time: FormatterHelper.timeString.string(from: viewModel.draft.dropOffTime)
@@ -60,13 +61,17 @@ struct ReservationDetailView: View {
                     vehicleRentalTotal: viewModel.vehicleRentalTotal,
                     extrasTotal: viewModel.extrasTotal,
                     grandTotal: viewModel.grandTotal,
-                    currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode
+                    currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode,
+                    displayCurrency: viewModel.draft.displayCurrency,
+                    rentalDayCount: viewModel.rentalDayCount
                 )
                 
                 if !viewModel.selectedExtras.isEmpty {
                     ReservationExtrasCard(
                         extras: viewModel.selectedExtras,
-                        currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode
+                        currencyCode: viewModel.draft.currencyCode ?? viewModel.selectedVehicle?.currencyCode,
+                        displayCurrency: viewModel.draft.displayCurrency,
+                        rentalDayCount: viewModel.rentalDayCount
                     )
                 }
                 
@@ -79,11 +84,11 @@ struct ReservationDetailView: View {
                 
                 if !viewModel.isReadOnly {
                     ORPrimaryButton(
-                        title: viewModel.actionButtonTitle,
+                        title: viewModel.actionButtonTitle(language: languageManager.language),
                         icon: "arrow.right"
                     ) {
                         Task {
-                            await viewModel.submitReservation()
+                            await viewModel.submitReservation(language: languageManager.language)
                         }
                     }
                     .disabled(viewModel.isSubmitting)
@@ -121,25 +126,25 @@ struct ReservationDetailView: View {
             
             Spacer()
             
-            Text(viewModel.screenTitle)
+            Text(viewModel.screenTitle(language: languageManager.language))
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
             
             Spacer()
             
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.clear)
-                .frame(width: 46, height: 46)
+            LanguageToggleButton()
         }
     }
     
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(viewModel.heroTitle)
+            Text(viewModel.heroTitle(language: languageManager.language))
                 .font(.system(size: 30, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text(viewModel.heroSubtitle)
+            Text(viewModel.heroSubtitle(language: languageManager.language))
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }

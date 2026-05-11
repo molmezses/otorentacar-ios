@@ -9,10 +9,14 @@
 import SwiftUI
 
 struct PaymentSummaryCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let vehicleRentalTotal: Double
     let extrasTotal: Double
     let grandTotal: Double
     let currencyCode: String?
+    let displayCurrency: PriceDisplayCurrency
+    let rentalDayCount: Int
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -20,25 +24,35 @@ struct PaymentSummaryCard: View {
                 Image(systemName: "creditcard.fill")
                     .foregroundColor(AppColors.primary)
                 
-                Text("Ödeme Özeti")
+                Text(languageManager.localized(turkish: "Ödeme Özeti", english: "Payment Summary"))
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
             }
             
-            summaryRow(title: "Araç Kiralama Bedeli", value: vehicleRentalTotal)
+            summaryRow(
+                title: languageManager.localized(
+                    turkish: "Araç Kiralama Bedeli (\(rentalDayCount) gün)",
+                    english: "Car Rental Total (\(rentalDayCount) days)"
+                ),
+                value: vehicleRentalTotal
+            )
             
             if extrasTotal > 0 {
-                summaryRow(title: "Ek Hizmetler", value: extrasTotal)
+                summaryRow(title: languageManager.localized(turkish: "Ek Hizmetler", english: "Extras"), value: extrasTotal)
             }
             
             Divider()
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("GENEL TOPLAM")
+                Text(languageManager.localized(turkish: "GENEL TOPLAM", english: "GRAND TOTAL"))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(AppColors.primary)
                 
-                Text(FormatterHelper.currencyString(grandTotal, code: currencyCode))
+                Text(FormatterHelper.displayCurrencyString(
+                    grandTotal,
+                    originalCode: currencyCode,
+                    displayCurrency: displayCurrency
+                ))
                     .font(.system(size: 30, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
             }
@@ -59,7 +73,11 @@ struct PaymentSummaryCard: View {
             
             Spacer()
             
-            Text(FormatterHelper.currencyString(value, code: currencyCode))
+            Text(FormatterHelper.displayCurrencyString(
+                value,
+                originalCode: currencyCode,
+                displayCurrency: displayCurrency
+            ))
                 .font(.system(size: 17, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
         }

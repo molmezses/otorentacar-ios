@@ -9,16 +9,26 @@
 import SwiftUI
 
 struct VehicleListCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
 
     let vehicle: Vehicle
+    let rentalDayCount: Int
+    let displayCurrency: PriceDisplayCurrency
 
     var selectAction: (() -> Void)? = nil
 
     @State private var isFavorite: Bool
 
-    init(vehicle: Vehicle, selectAction: (() -> Void)? = nil) {
+    init(
+        vehicle: Vehicle,
+        rentalDayCount: Int = 1,
+        displayCurrency: PriceDisplayCurrency = .eur,
+        selectAction: (() -> Void)? = nil
+    ) {
 
         self.vehicle = vehicle
+        self.rentalDayCount = rentalDayCount
+        self.displayCurrency = displayCurrency
 
         self.selectAction = selectAction
 
@@ -113,8 +123,8 @@ struct VehicleListCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18))
             
             HStack(spacing: 20) {
-                vehicleInfoItem(icon: "gearshape.fill", value: vehicle.transmission)
-                vehicleInfoItem(icon: "fuelpump.fill", value: vehicle.fuelType)
+                vehicleInfoItem(icon: "gearshape.fill", value: languageManager.localizedVehicleSpec(vehicle.transmission))
+                vehicleInfoItem(icon: "fuelpump.fill", value: languageManager.localizedVehicleSpec(vehicle.fuelType))
                 vehicleInfoItem(icon: "person.2.fill", value: "\(vehicle.passengerCount)")
                 vehicleInfoItem(icon: "suitcase.fill", value: "\(vehicle.baggageCount)")
             }
@@ -123,15 +133,26 @@ struct VehicleListCard: View {
             
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Günlük")
+                    Text(languageManager.localized(turkish: "Günlük", english: "Daily"))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                     
-                    Text(FormatterHelper.currencyString(vehicle.dailyPrice, code: vehicle.currencyCode))
+                    Text(FormatterHelper.displayCurrencyString(
+                        vehicle.dailyPrice,
+                        originalCode: vehicle.currencyCode,
+                        displayCurrency: displayCurrency
+                    ))
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.primary)
                     
-                    Text("Toplam \(FormatterHelper.currencyString(vehicle.totalPrice, code: vehicle.currencyCode))")
+                    Text(languageManager.localized(
+                        turkish: "\(rentalDayCount) gün toplam ",
+                        english: "\(rentalDayCount) days total "
+                    ) + FormatterHelper.displayCurrencyString(
+                        vehicle.totalPrice,
+                        originalCode: vehicle.currencyCode,
+                        displayCurrency: displayCurrency
+                    ))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
                 }
@@ -142,7 +163,7 @@ struct VehicleListCard: View {
                 Button(action: {
                     selectAction?()
                 }) {
-                    Text("Seç")
+                    Text(languageManager.localized(turkish: "Seç", english: "Select"))
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(width: 120, height: 50)

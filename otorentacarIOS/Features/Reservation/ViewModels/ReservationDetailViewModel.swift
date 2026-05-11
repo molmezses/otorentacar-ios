@@ -13,6 +13,7 @@ import Combine
 final class ReservationDetailViewModel: ObservableObject {
     @Published var name: String
     @Published var surname: String
+    @Published var phoneCountryCode: String
     @Published var phone: String
     @Published var birthDate: Date
     @Published var email: String
@@ -35,7 +36,9 @@ final class ReservationDetailViewModel: ObservableObject {
         self.mode = mode
         self.name = draft.customerInfo.name
         self.surname = draft.customerInfo.surname
-        self.phone = draft.customerInfo.phone
+        let parsedPhone = Self.parsePhone(draft.customerInfo.phone)
+        self.phoneCountryCode = parsedPhone.countryCode
+        self.phone = parsedPhone.number
         self.birthDate = draft.customerInfo.birthDate
         self.email = draft.customerInfo.email
         self.flightCode = draft.customerInfo.flightCode
@@ -130,34 +133,58 @@ final class ReservationDetailViewModel: ObservableObject {
     }
 
     var screenTitle: String {
+        screenTitle(language: .turkish)
+    }
+
+    func screenTitle(language: HomeLanguage) -> String {
         switch mode {
         case .create:
-            return "Rezervasyon Detayı"
+            return language == .turkish ? "Rezervasyon Detayı" : "Booking Detail"
         case .view:
-            return "Rezervasyon Bilgileri"
+            return language == .turkish ? "Rezervasyon Bilgileri" : "Booking Info"
         }
     }
 
     var heroTitle: String {
+        heroTitle(language: .turkish)
+    }
+
+    func heroTitle(language: HomeLanguage) -> String {
         switch mode {
         case .create:
-            return "Rezervasyon Detayları"
+            return language == .turkish ? "Rezervasyon Detayları" : "Booking Details"
         case .view:
-            return "Rezervasyonun Hazır"
+            return language == .turkish ? "Rezervasyonun Hazır" : "Your Booking Is Ready"
         }
     }
 
     var heroSubtitle: String {
+        heroSubtitle(language: .turkish)
+    }
+
+    func heroSubtitle(language: HomeLanguage) -> String {
         switch mode {
         case .create:
-            return "Bilgilerini doldurup rezervasyonu tamamlayabilirsin."
+            return language == .turkish
+                ? "Bilgilerini doldurup rezervasyonu tamamlayabilirsin."
+                : "Fill in your details to complete the booking."
         case .view:
-            return "Mevcut rezervasyon bilgilerini aşağıda görüntüleyebilirsin."
+            return language == .turkish
+                ? "Mevcut rezervasyon bilgilerini aşağıda görüntüleyebilirsin."
+                : "You can view your current booking details below."
         }
     }
 
     var actionButtonTitle: String {
-        isSubmitting ? "İşleniyor..." : "Rezervasyonu Tamamla"
+        actionButtonTitle(language: .turkish)
+    }
+
+    func actionButtonTitle(language: HomeLanguage) -> String {
+        if isSubmitting {
+            return language == .turkish ? "İşleniyor..." : "Processing..."
+        }
+
+        return language == .turkish ? "Rezervasyonu Tamamla" : "Complete Booking"
     }
 
     var reservationStatusText: String? {
@@ -190,11 +217,12 @@ final class ReservationDetailViewModel: ObservableObject {
             selectedVehicleModelId: draft.selectedVehicleModelId,
             currencyId: draft.currencyId,
             currencyCode: draft.currencyCode,
+            displayCurrency: draft.displayCurrency,
             selectedExtras: draft.selectedExtras,
             customerInfo: CustomerInfo(
                 name: name,
                 surname: surname,
-                phone: phone,
+                phone: combinedPhone,
                 birthDate: birthDate,
                 email: email,
                 flightCode: flightCode
@@ -202,11 +230,13 @@ final class ReservationDetailViewModel: ObservableObject {
         )
     }
 
-    func submitReservation() async {
+    func submitReservation(language: HomeLanguage = .turkish) async {
         guard !isReadOnly else { return }
 
         guard isFormValid else {
-            errorMessage = "Lütfen ad, soyad, telefon, doğum tarihi ve e-posta alanlarını doğru doldurun."
+            errorMessage = language == .turkish
+                ? "Lütfen ad, soyad, telefon, doğum tarihi ve e-posta alanlarını doğru doldurun."
+                : "Please fill in name, surname, phone, birth date and email correctly."
             return
         }
 
@@ -244,5 +274,31 @@ final class ReservationDetailViewModel: ObservableObject {
             currencyCode: draft.currencyCode ?? vehicle.currencyCode,
             status: "Yeni"
         )
+    }
+
+    var combinedPhone: String {
+        let trimmedCode = phoneCountryCode.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedPhone.isEmpty else { return trimmedPhone }
+        if trimmedPhone.hasPrefix("+") { return trimmedPhone }
+
+        return "\(trimmedCode) \(trimmedPhone)"
+    }
+
+    private static func parsePhone(_ value: String) -> (countryCode: String, number: String) {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.hasPrefix("+") else {
+            return ("+90", trimmed)
+        }
+
+        let parts = trimmed.split(separator: " ", maxSplits: 1, omittingEmptySubsequences: true)
+        guard let first = parts.first else {
+            return ("+90", trimmed)
+        }
+
+        let countryCode = String(first)
+        let number = parts.count > 1 ? String(parts[1]) : ""
+        return (countryCode, number)
     }
 }

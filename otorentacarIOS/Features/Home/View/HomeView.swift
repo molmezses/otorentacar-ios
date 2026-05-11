@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     @StateObject private var viewModel = HomeViewModel()
     @State private var navigateToVehicleList = false
     @State private var reservationDraft: ReservationDraft?
@@ -15,50 +16,65 @@ struct HomeView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 28) {
-                    ORTopBar(onMenuTap: onMenuTap)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Mükemmel Sürüşünüzü")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(AppColors.textPrimary)
-                        
-                        Text("Bugün Keşfedin.")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(AppColors.primary)
-                    }
-                    
-                    SearchFormCard(viewModel: viewModel) {
-                        if viewModel.validateSearchForm(),
-                           let draft = viewModel.buildReservationDraft() {
-                            reservationDraft = draft
-                            navigateToVehicleList = true
-                        }
-                    }
-                    
-                    VStack(spacing: 18) {
-                        ORSectionHeader(title: "Öne Çıkan Kiralık Araçlar", actionTitle: "Tümünü Gör") {
-                            if let draft = viewModel.buildReservationDraft() {
-                                reservationDraft = draft
-                                navigateToVehicleList = true
+            GeometryReader { proxy in
+                let contentWidth = max(proxy.size.width - 32, 0)
+
+                ZStack(alignment: .bottomTrailing) {
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 24) {
+                            ORTopBar(
+                                onMenuTap: onMenuTap
+                            )
+                            .frame(width: contentWidth)
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(languageManager.localized(
+                                    turkish: "Mükemmel Sürüşünüzü",
+                                    english: "Discover Your"
+                                ))
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundColor(AppColors.textPrimary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.78)
+
+                                Text(languageManager.localized(
+                                    turkish: "Bugün Keşfedin.",
+                                    english: "Perfect Drive Today."
+                                ))
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundColor(AppColors.primary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.78)
                             }
-                        }
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ForEach(viewModel.featuredVehicles) { vehicle in
-                                    FeaturedVehicleCard(vehicle: vehicle)
+                            .frame(width: contentWidth, alignment: .leading)
+
+                            SearchFormCard(viewModel: viewModel) {
+                                if viewModel.validateSearchForm(language: languageManager.language),
+                                   let draft = viewModel.buildReservationDraft() {
+                                    reservationDraft = draft
+                                    navigateToVehicleList = true
                                 }
                             }
+                            .frame(width: contentWidth)
+
+                            HomePromoBanner(language: languageManager.language)
+                                .frame(width: contentWidth)
                         }
+                        .frame(width: contentWidth, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 20)
+                        .padding(.bottom, 104)
                     }
-                    
-                    
+
+                    WhatsAppFloatingButton(
+                        phoneNumber: AppConstants.whatsappNumber,
+                        message: "Merhaba, araç kiralama hakkında bilgi almak istiyorum."
+                    )
+                    .padding(.trailing, 22)
+                    .padding(.bottom, 22)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 20)
-                .padding(.bottom, 24)
+                .frame(width: proxy.size.width, height: proxy.size.height)
+                .clipped()
             }
             .background(AppColors.background)
             .task {
@@ -74,8 +90,11 @@ struct HomeView: View {
                     VehicleListView(draft: reservationDraft)
                 }
             }
-            .alert("Uyarı", isPresented: $viewModel.showSearchErrorAlert) {
-                Button("Tamam", role: .cancel) { }
+            .alert(
+                languageManager.localized(turkish: "Uyarı", english: "Warning"),
+                isPresented: $viewModel.showSearchErrorAlert
+            ) {
+                Button(languageManager.localized(turkish: "Tamam", english: "OK"), role: .cancel) { }
             } message: {
                 Text(viewModel.searchErrorMessage)
             }

@@ -10,6 +10,7 @@ import SwiftUI
 struct ORTopBar: View {
     var onMenuTap: () -> Void
     var profileTap: (() -> Void)? = nil
+    var trailingContent: AnyView? = nil
     
     var body: some View {
         HStack {
@@ -19,13 +20,18 @@ struct ORTopBar: View {
                     .foregroundColor(AppColors.primary)
             }
             
-            Text("Otorentacar")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(AppColors.textPrimary)
+            OtorentacarLogoView(width: 142, height: 44, cornerRadius: 12)
             
             Spacer()
-            
-            
+
+            if let trailingContent {
+                trailingContent
+                    .layoutPriority(1)
+            } else {
+                LanguageToggleButton()
+                    .layoutPriority(1)
+            }
         }
+        .frame(maxWidth: .infinity)
     }
 }

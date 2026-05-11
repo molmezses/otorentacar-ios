@@ -11,6 +11,7 @@ import SwiftUI
 struct ExtraServicesView: View {
     @StateObject private var viewModel: ExtraServicesViewModel
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var languageManager: AppLanguageManager
 
     @State private var navigateToReservationDetail = false
 
@@ -43,12 +44,16 @@ struct ExtraServicesView: View {
                 grandTotal: (viewModel.vehicle?.totalPrice ?? 0) + viewModel.selectedExtras.reduce(0) { partial, item in
                     partial + (item.pricePerDay * Double(max(item.quantity, 1)) * Double(dayCount))
                 },
-                currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode
+                currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode,
+                displayCurrency: viewModel.draft.displayCurrency
             ) {
                 if viewModel.areChildrenAgesValid {
                     navigateToReservationDetail = true
                 } else {
-                    viewModel.errorMessage = "Lütfen tüm bebek koltuğu yaş bilgilerini girin."
+                    viewModel.errorMessage = languageManager.localized(
+                        turkish: "Lütfen tüm bebek koltuğu yaş bilgilerini girin.",
+                        english: "Please enter all child seat age information."
+                    )
                 }
             }
             .padding(.horizontal, 12)
@@ -93,15 +98,15 @@ struct ExtraServicesView: View {
 
             Spacer()
 
-            Text("Ek Hizmetler")
+            Text(languageManager.localized(turkish: "Ek Hizmetler", english: "Extras"))
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
 
             Spacer()
 
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.clear)
-                .frame(width: 46, height: 46)
+            LanguageToggleButton()
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -160,7 +165,7 @@ struct ExtraServicesView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
 
-                Text("\(dayCount) gün kiralama")
+                Text(languageManager.localized(turkish: "\(dayCount) gün kiralama", english: "\(dayCount) day rental"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.primary)
             }
@@ -171,11 +176,14 @@ struct ExtraServicesView: View {
 
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Yolculuğunu Güçlendir")
+            Text(languageManager.localized(turkish: "Yolculuğunu Güçlendir", english: "Upgrade Your Trip"))
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
 
-            Text("İhtiyacına uygun ek hizmetleri seçebilirsin.")
+            Text(languageManager.localized(
+                turkish: "İhtiyacına uygun ek hizmetleri seçebilirsin.",
+                english: "Choose the extras that fit your trip."
+            ))
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -186,21 +194,21 @@ struct ExtraServicesView: View {
         if viewModel.isLoading {
             VStack(spacing: 16) {
                 ProgressView()
-                Text("Ek hizmetler yükleniyor...")
+                Text(languageManager.localized(turkish: "Ek hizmetler yükleniyor...", english: "Loading extras..."))
                     .foregroundColor(AppColors.textSecondary)
             }
             .frame(maxWidth: .infinity)
             .padding(.top, 50)
         } else if let errorMessage = viewModel.errorMessage {
             VStack(spacing: 16) {
-                Text("Bir hata oluştu")
+                Text(languageManager.localized(turkish: "Bir hata oluştu", english: "Something went wrong"))
                     .font(.title3.bold())
 
                 Text(errorMessage)
                     .multilineTextAlignment(.center)
                     .foregroundColor(AppColors.textSecondary)
 
-                Button("Tekrar Dene") {
+                Button(languageManager.localized(turkish: "Tekrar Dene", english: "Try Again")) {
                     Task {
                         await viewModel.loadExtras()
                     }
@@ -229,6 +237,7 @@ struct ExtraServicesView: View {
                             viewModel.decreaseQuantity(for: item.id)
                         },
                         currencyCode: viewModel.draft.currencyCode ?? viewModel.vehicle?.currencyCode,
+                        displayCurrency: viewModel.draft.displayCurrency,
                         childrenAges: item.title.lowercased().contains("bebek koltuğu") ? viewModel.childrenAges : [],
                         onChildAgeChange: item.title.lowercased().contains("bebek koltuğu")
                             ? { index, value in
@@ -243,21 +252,27 @@ struct ExtraServicesView: View {
     
     private var childrenAgesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Bebek Koltuğu Yaş Bilgileri")
+            Text(languageManager.localized(turkish: "Bebek Koltuğu Yaş Bilgileri", english: "Child Seat Age Details"))
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
 
-            Text("Seçilen her bebek koltuğu için yaş bilgisi girin.")
+            Text(languageManager.localized(
+                turkish: "Seçilen her bebek koltuğu için yaş bilgisi girin.",
+                english: "Enter age information for each selected child seat."
+            ))
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
 
             ForEach(Array(viewModel.childrenAges.enumerated()), id: \.offset) { index, value in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("\(index + 1). Bebek Koltuğu Yaşı")
+                    Text(languageManager.localized(
+                        turkish: "\(index + 1). Bebek Koltuğu Yaşı",
+                        english: "Child Seat \(index + 1) Age"
+                    ))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(AppColors.textSecondary)
 
-                    TextField("Örn: 2", text: Binding(
+                    TextField(languageManager.localized(turkish: "Örn: 2", english: "Ex: 2"), text: Binding(
                         get: { value },
                         set: { viewModel.updateChildAge($0, at: index) }
                     ))

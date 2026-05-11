@@ -9,12 +9,18 @@
 import SwiftUI
 
 struct ContactView: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     var onMenuTap: () -> Void
     
     private let phoneNumber = "+90 531 709 8838"
     private let email = "iletisim@otorentacar.com"
-    private let address = "Kayseri Erkilet Havalimanı, Oto Rent A Car Ofis"
-    private let whatsappNumber = "905317098838"
+    private var address: String {
+        languageManager.localized(
+            turkish: "Kayseri Erkilet Havalimanı, Oto Rent A Car Ofis",
+            english: "Kayseri Erkilet Airport, Oto Rent A Car Office"
+        )
+    }
+    private let whatsappNumber = AppConstants.whatsappNumber
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -25,14 +31,14 @@ struct ContactView: View {
                 
                 ContactActionButton(
                     title: "WhatsApp",
-                    subtitle: "Hızlı destek için mesaj gönder",
+                    subtitle: languageManager.localized(turkish: "Hızlı destek için mesaj gönder", english: "Send a message for quick support"),
                     icon: "message.fill"
                 ) {
                     openWhatsApp()
                 }
                 
                 ContactInfoCard(
-                    title: "Telefon",
+                    title: languageManager.localized(turkish: "Telefon", english: "Phone"),
                     value: phoneNumber,
                     icon: "phone.fill"
                 )
@@ -41,7 +47,7 @@ struct ContactView: View {
                 }
                 
                 ContactInfoCard(
-                    title: "E-Posta",
+                    title: languageManager.localized(turkish: "E-Posta", english: "Email"),
                     value: email,
                     icon: "envelope.fill"
                 )
@@ -50,7 +56,7 @@ struct ContactView: View {
                 }
                 
                 ContactInfoCard(
-                    title: "Adres",
+                    title: languageManager.localized(turkish: "Adres", english: "Address"),
                     value: address,
                     icon: "location.fill"
                 )
@@ -66,15 +72,18 @@ struct ContactView: View {
     
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("İletişim")
+            Text(languageManager.localized(turkish: "İletişim", english: "Contact"))
                 .font(.system(size: 30, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text("Bize ulaşmanın en kolay yolu")
+            Text(languageManager.localized(turkish: "Bize ulaşmanın en kolay yolu", english: "The easiest way to reach us"))
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundColor(AppColors.primary)
             
-            Text("Telefon, e-posta ve WhatsApp üzerinden bizimle hızlıca iletişime geçebilirsiniz.")
+            Text(languageManager.localized(
+                turkish: "Telefon, e-posta ve WhatsApp üzerinden bizimle hızlıca iletişime geçebilirsiniz.",
+                english: "You can quickly contact us by phone, email, or WhatsApp."
+            ))
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }

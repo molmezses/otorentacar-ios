@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ReservationInfoBanner: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let trackingCode: String
     let status: String
     
@@ -16,7 +18,7 @@ struct ReservationInfoBanner: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("REZERVASYON KODU")
+                    Text(languageManager.localized(turkish: "REZERVASYON KODU", english: "BOOKING CODE"))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(AppColors.textSecondary)
                     
@@ -28,7 +30,7 @@ struct ReservationInfoBanner: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 6) {
-                    Text("DURUM")
+                    Text(languageManager.localized(turkish: "DURUM", english: "STATUS"))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(AppColors.textSecondary)
                     

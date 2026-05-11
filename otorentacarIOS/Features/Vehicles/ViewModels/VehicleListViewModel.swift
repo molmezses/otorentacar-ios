@@ -16,6 +16,7 @@ final class VehicleListViewModel: ObservableObject {
 
     @Published var selectedSortOption: VehicleSortOption = .recommended
     @Published var selectedFilterTitle: String = "Filtrele"
+    @Published var displayCurrency: PriceDisplayCurrency
 
     let draft: ReservationDraft
     private let priceSearchService: PriceSearchServiceProtocol
@@ -26,6 +27,7 @@ final class VehicleListViewModel: ObservableObject {
     ) {
         self.draft = draft
         self.priceSearchService = priceSearchService
+        self.displayCurrency = draft.displayCurrency
     }
 
     convenience init(draft: ReservationDraft) {
@@ -81,6 +83,7 @@ final class VehicleListViewModel: ObservableObject {
             selectedVehicleModelId: vehicle.id,
             currencyId: vehicle.currencyId,
             currencyCode: vehicle.currencyCode,
+            displayCurrency: displayCurrency,
             selectedExtras: draft.selectedExtras,
             customerInfo: draft.customerInfo,
             childrenAges: draft.childrenAges,
@@ -120,7 +123,7 @@ final class VehicleListViewModel: ObservableObject {
         }
     }
     
-    private var rentalDayCount: Int {
+    var rentalDayCount: Int {
         FormatterHelper.rentalDayCount(
             pickUpDate: draft.pickUpDate,
             pickUpTime: draft.pickUpTime,
@@ -137,5 +140,17 @@ enum VehicleSortOption: String, CaseIterable, Identifiable {
     case nameAscending = "A-Z"
 
     var id: String { rawValue }
-}
 
+    func localizedTitle(language: HomeLanguage) -> String {
+        switch self {
+        case .recommended:
+            return language == .turkish ? "Önerilen" : "Recommended"
+        case .priceLowToHigh:
+            return language == .turkish ? "Fiyat Artan" : "Price Low"
+        case .priceHighToLow:
+            return language == .turkish ? "Fiyat Azalan" : "Price High"
+        case .nameAscending:
+            return "A-Z"
+        }
+    }
+}

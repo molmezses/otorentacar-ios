@@ -9,9 +9,14 @@ import Foundation
 
 struct SideMenuItem: Identifiable, Hashable {
     let id = UUID()
-    let title: String
+    let turkishTitle: String
+    let englishTitle: String
     let icon: String
     let destination: SideMenuDestination
+
+    func title(language: HomeLanguage) -> String {
+        language == .turkish ? turkishTitle : englishTitle
+    }
 }
 
 enum SideMenuDestination: Hashable {
@@ -23,5 +28,4 @@ enum SideMenuDestination: Hashable {
     case services
     case contact
 }
-
 

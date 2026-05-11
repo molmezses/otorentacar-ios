@@ -15,12 +15,21 @@ enum AppTab: CaseIterable, Hashable {
     case contact
 
     var title: String {
+        localizedTitle(language: .turkish)
+    }
+
+    func localizedTitle(language: HomeLanguage) -> String {
         switch self {
-        case .reservation: return "Rezervasyon"
-        case .myReservations: return "Rezervasyonlarım"
-        case .favorites: return "Favorilerim"
-        case .query: return "Sorgula"
-        case .contact: return "İletişim"
+        case .reservation:
+            return language == .turkish ? "Rezervasyon" : "Book"
+        case .myReservations:
+            return language == .turkish ? "Rezervasyonlarım" : "Bookings"
+        case .favorites:
+            return language == .turkish ? "Favorilerim" : "Favorites"
+        case .query:
+            return language == .turkish ? "Sorgula" : "Query"
+        case .contact:
+            return language == .turkish ? "İletişim" : "Contact"
         }
     }
 

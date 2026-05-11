@@ -137,6 +137,7 @@ final class ExtraServicesViewModel: ObservableObject {
             selectedVehicleModelId: draft.selectedVehicleModelId,
             currencyId: draft.currencyId,
             currencyCode: draft.currencyCode,
+            displayCurrency: draft.displayCurrency,
             selectedExtras: selectedExtras,
             customerInfo: draft.customerInfo,
             childrenAges: childrenAges

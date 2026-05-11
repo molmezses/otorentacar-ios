@@ -9,6 +9,8 @@ import SwiftUI
 import MapKit
 
 struct ContactMapCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 38.7704, longitude: 35.4954),
         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
@@ -18,7 +20,7 @@ struct ContactMapCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Konum")
+            Text(languageManager.localized(turkish: "Konum", english: "Location"))
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             

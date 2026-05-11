@@ -65,45 +65,9 @@ final class HomeViewModel: ObservableObject {
     func onAppear() {
         Task {
             await loadLocations()
-            await loadHomeData()
         }
     }
     
-    func validateSearchForm() -> Bool {
-        guard selectedPickUpLocation != nil else {
-            searchErrorMessage = "Lütfen alış lokasyonu seçin."
-            showSearchErrorAlert = true
-            return false
-        }
-
-        if dropOffDifferentLocation && selectedDropOffLocation == nil {
-            searchErrorMessage = "Lütfen iade lokasyonu seçin."
-            showSearchErrorAlert = true
-            return false
-        }
-
-        let pickUpCombined = FormatterHelper.combine(date: pickUpDate, time: pickUpTime)
-        let dropOffCombined = FormatterHelper.combine(date: dropOffDate, time: dropOffTime)
-
-        let minimumPickUpDate = Date().addingTimeInterval(60 * 60)
-
-        if pickUpCombined < minimumPickUpDate {
-            searchErrorMessage = "Alış tarihi en az 1 saat sonrası olmalıdır."
-            showSearchErrorAlert = true
-            return false
-        }
-
-        if dropOffCombined <= pickUpCombined {
-            searchErrorMessage = "İade tarihi, alış tarihinden sonra olmalıdır."
-            showSearchErrorAlert = true
-            return false
-        }
-
-        return true
-    }
-    
-    
-
     func loadHomeData() async {
         isLoading = true
         errorMessage = nil
@@ -228,6 +192,58 @@ final class HomeViewModel: ObservableObject {
         showSearchErrorAlert = false
         searchErrorMessage = ""
         errorMessage = nil
+    }
+
+    func validateSearchForm(language: HomeLanguage) -> Bool {
+        guard selectedPickUpLocation != nil else {
+            searchErrorMessage = localized(
+                turkish: "Lütfen alış lokasyonu seçin.",
+                english: "Please select a pick-up location.",
+                language: language
+            )
+            showSearchErrorAlert = true
+            return false
+        }
+
+        if dropOffDifferentLocation && selectedDropOffLocation == nil {
+            searchErrorMessage = localized(
+                turkish: "Lütfen iade lokasyonu seçin.",
+                english: "Please select a drop-off location.",
+                language: language
+            )
+            showSearchErrorAlert = true
+            return false
+        }
+
+        let pickUpCombined = FormatterHelper.combine(date: pickUpDate, time: pickUpTime)
+        let dropOffCombined = FormatterHelper.combine(date: dropOffDate, time: dropOffTime)
+        let minimumPickUpDate = Date().addingTimeInterval(60 * 60)
+
+        if pickUpCombined < minimumPickUpDate {
+            searchErrorMessage = localized(
+                turkish: "Alış tarihi en az 1 saat sonrası olmalıdır.",
+                english: "Pick-up time must be at least 1 hour from now.",
+                language: language
+            )
+            showSearchErrorAlert = true
+            return false
+        }
+
+        if dropOffCombined <= pickUpCombined {
+            searchErrorMessage = localized(
+                turkish: "İade tarihi, alış tarihinden sonra olmalıdır.",
+                english: "Drop-off time must be after pick-up time.",
+                language: language
+            )
+            showSearchErrorAlert = true
+            return false
+        }
+
+        return true
+    }
+
+    func localized(turkish: String, english: String, language: HomeLanguage) -> String {
+        language == .turkish ? turkish : english
     }
     
     

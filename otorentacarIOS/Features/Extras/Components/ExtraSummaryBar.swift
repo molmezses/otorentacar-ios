@@ -9,23 +9,26 @@
 import SwiftUI
 
 struct ExtraSummaryBar: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let vehicleTotal: Double
     let extrasTotal: Double
     let grandTotal: Double
     let currencyCode: String?
+    let displayCurrency: PriceDisplayCurrency
     let action: () -> Void
     
     var body: some View {
         VStack(spacing: 14) {
             HStack {
-                summaryItem(title: "Araç", value: vehicleTotal)
+                summaryItem(title: languageManager.localized(turkish: "Araç", english: "Car"), value: vehicleTotal)
                 Spacer()
-                summaryItem(title: "Ek Hizmet", value: extrasTotal)
+                summaryItem(title: languageManager.localized(turkish: "Ek Hizmet", english: "Extras"), value: extrasTotal)
                 Spacer()
-                summaryItem(title: "Toplam", value: grandTotal, isHighlighted: true)
+                summaryItem(title: languageManager.localized(turkish: "Toplam", english: "Total"), value: grandTotal, isHighlighted: true)
             }
             
-            ORPrimaryButton(title: "Devam Et", action: action)
+            ORPrimaryButton(title: languageManager.localized(turkish: "Devam Et", english: "Continue"), action: action)
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -43,7 +46,11 @@ struct ExtraSummaryBar: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
             
-            Text(FormatterHelper.currencyString(value, code: currencyCode))
+            Text(FormatterHelper.displayCurrencyString(
+                value,
+                originalCode: currencyCode,
+                displayCurrency: displayCurrency
+            ))
                 .font(.system(size: isHighlighted ? 20 : 16, weight: .bold))
                 .foregroundColor(isHighlighted ? AppColors.primary : AppColors.textPrimary)
         }

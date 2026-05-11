@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct BookingQueryView: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     @StateObject private var viewModel = BookingQueryViewModel()
     var onMenuTap: () -> Void
     
@@ -26,7 +27,7 @@ struct BookingQueryView: View {
                         bookingCode: $viewModel.bookingCode,
                         isLoading: viewModel.isLoading
                     ) {
-                        viewModel.queryReservation()
+                        viewModel.queryReservation(language: languageManager.language)
                     }
                     
                     if let errorMessage = viewModel.errorMessage {
@@ -56,11 +57,14 @@ struct BookingQueryView: View {
     
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Rezervasyon Sorgula")
+            Text(languageManager.localized(turkish: "Rezervasyon Sorgula", english: "Booking Query"))
                 .font(.system(size: 30, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            Text("Takip kodun ile mevcut rezervasyon bilgilerine hızlıca ulaşabilirsin.")
+            Text(languageManager.localized(
+                turkish: "Takip kodun ile mevcut rezervasyon bilgilerine hızlıca ulaşabilirsin.",
+                english: "Quickly access your booking details with your tracking code."
+            ))
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -78,11 +82,14 @@ struct BookingQueryView: View {
                 )
             
             VStack(alignment: .leading, spacing: 6) {
-                Text("Rezervasyon Takibi")
+                Text(languageManager.localized(turkish: "Rezervasyon Takibi", english: "Booking Tracking"))
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
                 
-                Text("Kodunu girerek mevcut rezervasyon detaylarını görüntüleyebilirsin.")
+                Text(languageManager.localized(
+                    turkish: "Kodunu girerek mevcut rezervasyon detaylarını görüntüleyebilirsin.",
+                    english: "Enter your code to view your existing booking details."
+                ))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -98,26 +105,26 @@ struct BookingQueryView: View {
     
     private var infoSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Nasıl Çalışır?")
+            Text(languageManager.localized(turkish: "Nasıl Çalışır?", english: "How It Works"))
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
             queryInfoRow(
                 number: "1",
-                title: "Takip kodunu gir",
-                description: "Rezervasyon tamamlandığında sana verilen kodu yaz."
+                title: languageManager.localized(turkish: "Takip kodunu gir", english: "Enter your tracking code"),
+                description: languageManager.localized(turkish: "Rezervasyon tamamlandığında sana verilen kodu yaz.", english: "Type the code you received after completing your booking.")
             )
             
             queryInfoRow(
                 number: "2",
-                title: "Sorgulamayı başlat",
-                description: "Butona bastığında sistem rezervasyonunu kontrol eder."
+                title: languageManager.localized(turkish: "Sorgulamayı başlat", english: "Start the query"),
+                description: languageManager.localized(turkish: "Butona bastığında sistem rezervasyonunu kontrol eder.", english: "The system checks your booking when you tap the button.")
             )
             
             queryInfoRow(
                 number: "3",
-                title: "Detaylarını görüntüle",
-                description: "Bulunan rezervasyon detay ekranında açılır."
+                title: languageManager.localized(turkish: "Detaylarını görüntüle", english: "View the details"),
+                description: languageManager.localized(turkish: "Bulunan rezervasyon detay ekranında açılır.", english: "The matching booking opens on the detail screen.")
             )
         }
     }

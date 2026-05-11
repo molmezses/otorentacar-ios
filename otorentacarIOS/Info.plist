@@ -8,5 +8,9 @@
 	<string>$(API_PASSWORD)</string>
 	<key>API_USERNAME</key>
 	<string>$(API_USERNAME)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+	</array>
 </dict>
 </plist>

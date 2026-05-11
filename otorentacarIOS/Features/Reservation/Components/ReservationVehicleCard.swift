@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ReservationVehicleCard: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let vehicle: Vehicle
     
     var body: some View {
@@ -28,7 +30,7 @@ struct ReservationVehicleCard: View {
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
                 
-                Text("\(vehicle.transmission) | \(vehicle.fuelType)")
+                Text("\(languageManager.localizedVehicleSpec(vehicle.transmission)) | \(languageManager.localizedVehicleSpec(vehicle.fuelType))")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
             }

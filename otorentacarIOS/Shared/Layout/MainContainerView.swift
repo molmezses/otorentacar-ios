@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MainContainerView: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     @State private var selectedTab: AppTab = .reservation
     @State private var showMenu = false
     @State private var selectedMenuDestination: SideMenuDestination? = nil
@@ -97,7 +99,7 @@ struct MainContainerView: View {
             
             VStack(spacing: 16) {
                 ProgressView()
-                Text("Bağlantı hazırlanıyor...")
+                Text(languageManager.localized(turkish: "Bağlantı hazırlanıyor...", english: "Preparing connection..."))
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -113,7 +115,7 @@ struct MainContainerView: View {
                     .font(.system(size: 42))
                     .foregroundColor(AppColors.primary)
                 
-                Text("Bağlantı Kurulamadı")
+                Text(languageManager.localized(turkish: "Bağlantı Kurulamadı", english: "Connection Failed"))
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(AppColors.textPrimary)
                 
@@ -128,7 +130,7 @@ struct MainContainerView: View {
                         await sessionManager.prepareSession()
                     }
                 } label: {
-                    Text("Tekrar Dene")
+                    Text(languageManager.localized(turkish: "Tekrar Dene", english: "Try Again"))
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 24)

@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+enum AppConstants {
+    static let whatsappNumber = "905317098838"
+    static let eurToTryRate = 53.0
+}

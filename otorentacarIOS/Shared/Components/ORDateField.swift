@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ORDateField: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
+
     let title: String
     @Binding var date: Date
     
@@ -17,24 +19,28 @@ struct ORDateField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title.uppercased())
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundColor(AppColors.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
             
             Button {
                 showDatePickerSheet = true
             } label: {
-                HStack {
-                    Text(FormatterHelper.shortDate.string(from: date))
-                        .font(.system(size: 18, weight: .semibold))
+                HStack(spacing: 6) {
+                    Text(languageManager.shortDateString(from: date))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(AppColors.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.62)
                     
-                    Spacer()
+                    Spacer(minLength: 4)
                     
                     Image(systemName: "calendar")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(AppColors.primary)
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 10)
                 .frame(height: 58)
                 .background(AppColors.inputBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -44,7 +50,7 @@ struct ORDateField: View {
                 NavigationStack {
                     VStack(spacing: 24) {
                         DatePicker(
-                            "Teslim Alma Tarihi",
+                            languageManager.localized(turkish: "Teslim Alma Tarihi", english: "Pick-up Date"),
                             selection: $date,
                             displayedComponents: .date
                         )
@@ -55,11 +61,11 @@ struct ORDateField: View {
                         Spacer()
                     }
                     .padding(.top, 20)
-                    .navigationTitle("Tarih Seç")
+                    .navigationTitle(languageManager.localized(turkish: "Tarih Seç", english: "Select Date"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button("Tamam") {
+                            Button(languageManager.localized(turkish: "Tamam", english: "Done")) {
                                 showDatePickerSheet = false
                             }
                             .foregroundColor(AppColors.primary)
@@ -69,5 +75,6 @@ struct ORDateField: View {
                 .presentationDetents([.medium])
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

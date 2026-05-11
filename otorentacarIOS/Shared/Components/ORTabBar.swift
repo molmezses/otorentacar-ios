@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ORTabBar: View {
+    @EnvironmentObject private var languageManager: AppLanguageManager
     @Binding var selectedTab: AppTab
     
     var body: some View {
@@ -29,7 +30,7 @@ struct ORTabBar: View {
                         }
                         .frame(height: 46)
                         
-                        Text(tab.title)
+                        Text(tab.localizedTitle(language: languageManager.language))
                             .font(.system(size: 10, weight: .medium))
                             .foregroundColor(selectedTab == tab ? AppColors.primary : Color.gray)
                             .lineLimit(1)

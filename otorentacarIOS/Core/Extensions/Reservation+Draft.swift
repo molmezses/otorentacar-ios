@@ -24,6 +24,7 @@ extension Reservation {
             selectedVehicleModelId: vehicle.id,
             currencyId: vehicle.currencyId,
             currencyCode: vehicle.currencyCode,
+            displayCurrency: PriceDisplayCurrency(rawValue: vehicle.currencyCode ?? "") ?? .eur,
             selectedExtras: [],
             customerInfo: CustomerInfo(
                 name: firstName,
