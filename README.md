@@ -206,6 +206,7 @@ This project was developed as a real-world rental app experience focusing on:
 
 ⸻
 
+
 Author
 
 Mustafa Ölmezses
